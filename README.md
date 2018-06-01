@@ -10,5 +10,5 @@ Enternot-App is the Android Client for the project [Enternot-pi](https://github.
 | Christoph   | [![Build Status](https://img.shields.io/travis/Shynixn/enternot-app/developer/christoph.svg?style=flat-square)](https://travis-ci.org/Shynixn/enternot-app) |[Assigned Issues/Todos](https://github.com/Shynixn/enternot-app/issues?q=is%3Aopen+assignee%3AShynixn) [![Coverage Status](https://img.shields.io/coveralls/Shynixn/enternot-app/developer/christoph.svg?style=flat-square)](https://coveralls.io/github/Shynixn/enternot-app?branch=developer%2Fchristoph) |
 ### Contributing / Development
 1. Checkout the repository
-2. Gradle Sync
+2. Gradle Sync 
 3. Run on a smart device running Android +5.0
