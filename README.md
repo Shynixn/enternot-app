@@ -6,10 +6,9 @@ Enternot-App is the Android Client for the project [Enternot-pi](https://github.
 
 | Branch        | Status        | Information |
 | ------------- | --------------| ------- |
-| **master**        | [![Build Status](https://travis-ci.org/Shynixn/enternot-app.svg?branch=master)](https://travis-ci.org/lukasbindreiter/white-brush) | [![Coverage Status](https://img.shields.io/coveralls/lukasbindreiter/white-brush/master.svg?style=flat-square)](https://coveralls.io/github/lukasbindreiter/white-brush?branch=master) |
-| **developer/christoph**        | [![Build Status](https://travis-ci.org/Shynixn/enternot-app.svg?branch=master)](https://travis-ci.org/lukasbindreiter/white-brush) | [![Coverage Status](https://img.shields.io/coveralls/lukasbindreiter/white-brush/master.svg?style=flat-square)](https://coveralls.io/github/lukasbindreiter/white-brush?branch=master) |
-
+| **master**        | [![Build Status](https://travis-ci.org/Shynixn/enternot-app.svg?branch=master)](https://travis-ci.org/Shynixn/enternot-app) | [![Coverage Status](https://img.shields.io/coveralls/Shynixn/enternot-app/master.svg?style=flat-square)](https://coveralls.io/github/Shynixn/enternot-app?branch=master) |
+| Christoph   | [![Build Status](https://img.shields.io/travis/Shynixn/enternot-app/developer/christoph.svg?style=flat-square)](https://travis-ci.org/Shynixn/enternot-app) |[Assigned Issues/Todos](https://github.com/lShynixn/enternot-app/issues?q=is%3Aopen+assignee%3AShynixn) [![Coverage Status](https://img.shields.io/coveralls/Shynixn/enternot-app/developer/christoph.svg?style=flat-square)](https://coveralls.io/github/Shynixn/enternot-app?branch=developer%2Fchristoph) |
 ### Contributing / Development
 1. Checkout the repository
 2. Gradle Sync
-3. Run in on a smart device running Android +5.0
+3. Run on a smart device running Android +5.0
