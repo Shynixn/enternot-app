@@ -11,6 +11,8 @@ class SirenServiceImpl(private val connectionService: ConnectionService) : Siren
      */
     @Throws(IOException::class)
     override fun playSiren() {
+        Thread.sleep(10000)
+
         connectionService.post<Any>("/api/startsiren")
     }
 }
