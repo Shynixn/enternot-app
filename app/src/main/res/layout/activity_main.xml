@@ -1,14 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="at.jku.enternot.MainActivity">
+    tools:context="at.jku.enternot.MainActivity"
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+    <VideoView
+        android:id="@+id/view_streaming"
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
+
+    <ToggleButton
+        android:id="@+id/toggle_button_voice"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:drawablePadding="-24dp"
+        android:drawableStart="@drawable/voice_selector"
+        android:textOff="@string/voice_off"
+        android:textOn="@string/voice_on"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@android:color/white"/>
+
+    <ToggleButton
+        android:id="@+id/toggle_button_move_camera"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:drawablePadding="-24dp"
+        android:drawableStart="@drawable/camera_rotation_selector"
+        android:textOff="@string/camera_rotation_off"
+        android:textOn="@string/camera_rotation_on"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/button_siren"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawableTop="@drawable/ic_siren_white_96dp"
+        android:text="@string/siren"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:textSize="24sp"
+        android:paddingTop="30dp" android:paddingBottom="30dp"/>
 
 </LinearLayout>

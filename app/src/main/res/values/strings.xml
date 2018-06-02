@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Enternot</string>
+    <string name="voice_off">Voice Off</string>
+    <string name="voice_on">Voice On</string>
+    <string name="camera_rotation_off">Camera Rotation Off</string>
+    <string name="camera_rotation_on">Camera Rotation On</string>
+    <string name="siren">Siren</string>
 </resources>
