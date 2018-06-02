@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Enternot</string>
+    <string name="title_activity_configuration">ConfigurationActivity</string>
+    <string name="hostname">Hostname</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="enternot_settings">Enternot Settings</string>
+    <string name="save">Save</string>
 </resources>

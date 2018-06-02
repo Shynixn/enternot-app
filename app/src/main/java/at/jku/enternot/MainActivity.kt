@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                 if (success) {
                     // Create fancy animation
                 } else {
-                    Toast.makeText(context, "Cannot connect to serverr!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Cannot connect to server!", Toast.LENGTH_LONG).show()
                 }
             }
         }

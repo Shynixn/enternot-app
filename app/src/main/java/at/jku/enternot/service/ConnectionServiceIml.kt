@@ -11,6 +11,7 @@ class ConnectionServiceIml(baseURL: String) : ConnectionService {
      */
     @Throws(IOException::class)
     override fun <T> post(url: String, item: T?) {
+        Thread.sleep(10000)
         throw IOException("Please implement the connection stuff.")
     }
 }
