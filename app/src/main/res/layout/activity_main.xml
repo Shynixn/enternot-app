@@ -53,6 +53,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@android:color/holo_red_dark"
         android:drawableTop="@drawable/ic_siren_white_96dp"
         android:paddingBottom="30dp"
         android:paddingTop="30dp"
