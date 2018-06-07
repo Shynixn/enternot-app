@@ -1,13 +1,28 @@
 package at.jku.enternot.contract
 
-import java.io.IOException
+import android.arch.lifecycle.MutableLiveData
+import at.jku.enternot.entity.SirenBlinkingState
 
 interface MainActivityViewModel {
 
     /**
      * Plays the siren at the house of the app user.
-     * @throws [IOException] when the connection to the server fails.
+     * Returns the status code of the webRequest.
      */
-    @Throws(IOException::class)
-    fun playSiren()
+    fun playSiren(): Int
+
+    /**
+     * Gets the progressing state of the app.
+     */
+    fun getProgressingState(): MutableLiveData<Boolean>
+
+    /**
+     * Gets the siren button state of the app.
+     */
+    fun getSirenButtonState(): MutableLiveData<Boolean>
+
+    /**
+     * Gets the blinking state of the siren.
+     */
+    fun getSirenBlinkingState(): MutableLiveData<SirenBlinkingState>
 }

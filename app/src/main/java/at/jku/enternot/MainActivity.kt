@@ -1,34 +1,31 @@
 package at.jku.enternot
 
+import android.arch.lifecycle.Observer
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
-import kotlinx.android.synthetic.main.activity_main.*
-import android.util.Log
 import android.widget.Toast
+import at.jku.enternot.entity.SirenBlinkingState
+import at.jku.enternot.extension.uiThreadLater
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
-import java.io.IOException
-import com.google.android.exoplayer2.util.Util.getUserAgent
-import com.google.android.exoplayer2.source.ExtractorMediaSource
-import com.google.android.exoplayer2.source.MediaSource
-import android.os.Looper
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,7 +38,6 @@ class MainActivity : AppCompatActivity() {
         toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
         toggle_button_move_camera.setOnCheckedChangeListener(this::onCamaeraMoveCheckChange)
         button_siren.setOnClickListener(this::onSirenClick)
-
 
         // Sample Play Video code
 
@@ -67,6 +63,43 @@ class MainActivity : AppCompatActivity() {
 
         // Sample Play Video Code.
 
+        mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
+            if (isProgressing!!) {
+                progressbar_load_mainPage.visibility = View.VISIBLE
+            } else {
+                progressbar_load_mainPage.visibility = View.GONE
+            }
+        })
+
+        mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
+            button_siren.isEnabled = isEnabled!!
+        })
+
+        mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
+            if (blinkingState == SirenBlinkingState.BLINK) {
+                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
+                doAsync {
+                    uiThreadLater({ context ->
+                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
+                        } else {
+                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                        }
+                    }, 500)
+                }
+            } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
+                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
+                doAsync {
+                    uiThreadLater({ context ->
+                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
+                        } else {
+                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                        }
+                    }, 500)
+                }
+            }
+        })
     }
 
     private class SomeKotlinListenr : Player.EventListener {
@@ -129,31 +162,39 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
     }
 
-    private fun onSirenClick(view: View) {
-        // TODO: Implement activate siren
-        Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
-    }
-
     /**
-     * Plays the siren asynchronously.
+     * When the view gets clicked the app starts the siren.
      */
-    private fun playSiren() {
+    private fun onSirenClick(view: View) {
+        mainActivityViewModel.getProgressingState().value = true
+        mainActivityViewModel.getSirenButtonState().value = false
         doAsync {
-            var success = false
-            try {
-                mainActivityViewModel.playSiren()
-                success = true
-            } catch (e: IOException) {
-                Log.e(LOG_TAG, "Failed to play the siren.", e)
-            }
-
-            // The uiThread call does only work when the context was not destroyed. Otherwise it gets ignored.
+            val statusCode = mainActivityViewModel.playSiren()
             uiThread { context ->
-                if (success) {
-                    // Create fancy animation
-                } else {
-                    Toast.makeText(context, "Cannot connect to server!", Toast.LENGTH_LONG).show()
+                when (statusCode) {
+                    200 -> {
+                        if (mainActivityViewModel.getSirenBlinkingState().value == null || mainActivityViewModel.getSirenBlinkingState().value == SirenBlinkingState.DISABLED) {
+                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
+                        }
+
+                        Toast.makeText(context, "Siren started", Toast.LENGTH_LONG).show()
+
+                        uiThreadLater({
+                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.DISABLED
+                            mainActivityViewModel.getSirenButtonState().value = true
+                        }, 15000)
+                    }
+                    401 -> {
+                        mainActivityViewModel.getSirenButtonState().value = true
+                        Toast.makeText(context, "Stored username or password is invalid", Toast.LENGTH_LONG).show()
+                    }
+                    else -> {
+                        mainActivityViewModel.getSirenButtonState().value = true
+                        Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
+                    }
                 }
+
+                mainActivityViewModel.getProgressingState().value = false
             }
         }
     }
