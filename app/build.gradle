@@ -26,7 +26,14 @@ android {
     }
 }
 
-def build_param = "${project.findProperty('ci')?:'false'}"
+tasks.withType(Test) {
+    testLogging {
+        exceptionFormat "full"
+        events "passed", "skipped", "failed"
+    }
+}
+
+def build_param = "${project.findProperty('ci') ?: 'false'}"
 
 if (build_param != "true") {
     //exclude production build
@@ -60,7 +67,11 @@ dependencies {
 
     implementation "android.arch.lifecycle:extensions:1.1.1"
     implementation "org.jetbrains.anko:anko-commons:0.10.4"
-    compile "org.koin:koin-android-architecture:0.9.3"
+    implementation "org.koin:koin-android-architecture:0.9.3"
+
+    implementation 'com.google.android.exoplayer:exoplayer:2.7.0'
+
+    testImplementation group: 'org.mockito', name: 'mockito-all', version: '2.0.2-beta'
 }
 
 apply plugin: 'com.google.gms.google-services'

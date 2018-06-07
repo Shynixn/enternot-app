@@ -9,6 +9,7 @@
         <item name="android:colorForeground">@android:color/background_light</item>
         <item name="android:statusBarColor">@android:color/holo_orange_light</item>
         <item name="android:buttonStyle">@style/buttonStyle</item>
+        <item name="android:buttonStyleToggle">@style/buttonStyle</item>
         <item name="android:actionBarStyle">@style/AppActionBar</item>
     </style>
 
