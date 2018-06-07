@@ -1,34 +1,31 @@
 package at.jku.enternot
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
-import kotlinx.android.synthetic.main.activity_main.*
-import android.util.Log
 import android.widget.Toast
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
 import java.io.IOException
-import com.google.android.exoplayer2.util.Util.getUserAgent
-import com.google.android.exoplayer2.source.ExtractorMediaSource
-import com.google.android.exoplayer2.source.MediaSource
-import android.os.Looper
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,23 +35,29 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
-        toggle_button_move_camera.setOnCheckedChangeListener(this::onCamaeraMoveCheckChange)
-        button_siren.setOnClickListener(this::onSirenClick)
 
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white))
+        setSupportActionBar(toolbar)
+
+        @Suppress("PLUGIN_WARNING")
+        if(isInPortrait()) {
+            toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
+            toggle_button_move_camera.setOnCheckedChangeListener(this::onCamaeraMoveCheckChange)
+            button_siren.setOnClickListener(this::onSirenClick)
+        }
 
         // Sample Play Video code
 
-        val sourceuri = "https://www.w3schools.com/tags/mov_bbb.mp4";
+        val sourceuri = "https://www.w3schools.com/tags/mov_bbb.mp4"
 
-        val bandwidthMeter = DefaultBandwidthMeter();
+        val bandwidthMeter = DefaultBandwidthMeter()
         val dataSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(this, "exoplayer2example"))
         dataSourceFactory.defaultRequestProperties.set("basic", "asdasdsad")
 
-        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter);
-        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory);
+        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
+        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
 
-        val player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        val player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
         player.addListener(SomeKotlinListenr())
         view_streaming.player = player
 
@@ -62,8 +65,8 @@ class MainActivity : AppCompatActivity() {
         val uri = Uri.parse(sourceuri)
         val mediaSource = ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
 
-        player.prepare(mediaSource);
-        player.setPlayWhenReady(true);
+        player.prepare(mediaSource)
+        player.playWhenReady = true
 
         // Sample Play Video Code.
 
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.settings, menu)
+        inflater.inflate(R.menu.action_menu, menu)
         return true
     }
 
@@ -112,6 +115,14 @@ class MainActivity : AppCompatActivity() {
         R.id.action_settings -> {
             // TODO: Implement show settings activity.
             Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
+            true
+        }
+        R.id.action_voice -> {
+            item.isChecked = !item.isChecked
+            true
+        }
+        R.id.action_camera_move -> {
+            item.isChecked = !item.isChecked
             true
         }
         else -> {
@@ -157,4 +168,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun isInPortrait(): Boolean =
+            this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 }
