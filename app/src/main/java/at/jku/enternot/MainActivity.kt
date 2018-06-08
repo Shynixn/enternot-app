@@ -49,10 +49,6 @@ class MainActivity : AppCompatActivity() {
             button_siren.setOnClickListener(this::onSirenClick)
         }
 
-        toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
-        toggle_button_move_camera.setOnCheckedChangeListener(this::onCamaeraMoveCheckChange)
-        button_siren.setOnClickListener(this::onSirenClick)
-
         // Sample Play Video code
 
         val sourceuri = "https://www.w3schools.com/tags/mov_bbb.mp4"

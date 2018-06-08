@@ -11,6 +11,7 @@
         <item name="android:buttonStyle">@style/buttonStyle</item>
         <item name="android:buttonStyleToggle">@style/buttonStyle</item>
         <item name="android:actionBarStyle">@style/AppActionBar</item>
+        <item name="android:popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -31,6 +32,13 @@
 
     <style name="AppActionBar">
         <item name="android:height">50dp</item>
+    </style>
+
+    <style name="EnternotToolBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="EnternotToolBarPopupTheme" parent="ThemeOverlay.AppCompat.Light">
     </style>
 
 </resources>
