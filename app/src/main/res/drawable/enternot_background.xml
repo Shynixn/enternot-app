@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <path
+        android:fillColor="#4F5D73"
+        android:pathData="M 31.833 0 C 49.5061119946 0 63.833 14.3268880054 63.833 32 C 63.833 49.6731119946 49.5061119946 64 31.833 64 C 14.1598880054 64 -0.167 49.6731119946 -0.167 32 C -0.167 14.3268880054 14.1598880054 0 31.833 0 Z" />
+    <path
+        android:fillColor="#F5CF87"
+        android:pathData="M 24 16 H 30 V 30 H 24 V 16 Z" />
+    <path
+        android:fillColor="#F5CF87"
+        android:pathData="M 24 34 H 30 V 48 H 24 V 34 Z" />
+    <path
+        android:fillColor="#F5CF87"
+        android:pathData="M 34 16 H 40 V 30 H 34 V 16 Z" />
+    <path
+        android:fillColor="#F5CF87"
+        android:pathData="M 34 34 H 40 V 48 H 34 V 34 Z" />
+    <path
+        android:fillColor="#231F20"
+        android:fillAlpha="0.2"
+        android:strokeAlpha="0.2"
+        android:strokeWidth="1"
+        android:pathData="M40,14H24c-2.209,0-4,1.791-4,4v32c0,2.209,1.791,4,4,4h16c2.209,0,4-1.791,4-4V18 C44,15.791,42.209,14,40,14z M30,50h-6V36h6V50z M30,32h-6V18h6V32z M40,50h-6V36h6V50z M40,32h-6V18h6V32z" />
+    <path
+        android:fillColor="#E0995E"
+        android:pathData="M40,12H24c-2.209,0-4,1.791-4,4v32c0,2.209,1.791,4,4,4h16c2.209,0,4-1.791,4-4V16 C44,13.791,42.209,12,40,12z M30,48h-6V34h6V48z M30,30h-6V16h6V30z M40,48h-6V34h6V48z M40,30h-6V16h6V30z" />
+    <path
+        android:fillColor="#231F20"
+        android:fillAlpha="0.2"
+        android:strokeAlpha="0.2"
+        android:strokeWidth="1"
+        android:pathData="M 40 31 C 41.6568542495 31 43 32.3431457505 43 34 C 43 35.6568542495 41.6568542495 37 40 37 C 38.3431457505 37 37 35.6568542495 37 34 C 37 32.3431457505 38.3431457505 31 40 31 Z" />
+    <path
+        android:fillColor="#F5CF87"
+        android:pathData="M 40 29 C 41.6568542495 29 43 30.3431457505 43 32 C 43 33.6568542495 41.6568542495 35 40 35 C 38.3431457505 35 37 33.6568542495 37 32 C 37 30.3431457505 38.3431457505 29 40 29 Z" />
+</vector>
