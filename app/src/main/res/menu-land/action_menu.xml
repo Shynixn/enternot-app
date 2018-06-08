@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="Settings"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_voice"
+        android:icon="@drawable/ic_voice_off_white_24dp"
+        android:checkable="true"
+        android:title="Voice"/>
+
+    <item
+        android:id="@+id/action_camera_move"
+        android:icon="@drawable/ic_camera_rotation_on_white_24dp"
+        android:checkable="true"
+        android:title="Camera Rotation"/>
+
+    <item
+        android:id="@+id/action_siren"
+        android:icon="@drawable/ic_siren_white_24dp"
+        android:title="@string/siren"/>
+</menu>
