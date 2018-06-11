@@ -23,7 +23,7 @@
 
 
         </activity>
-        <service android:name=".services.EnternotFirebaseMessagingService">
+        <service android:name=".service.EnternotFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

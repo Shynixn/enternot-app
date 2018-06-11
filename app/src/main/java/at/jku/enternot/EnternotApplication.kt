@@ -1,9 +1,11 @@
 package at.jku.enternot
 
 import android.app.Application
+import at.jku.enternot.contract.CameraMovementService
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
 import at.jku.enternot.contract.SirenService
+import at.jku.enternot.service.CameraMovementServiceImpl
 import at.jku.enternot.service.ConfigurationServiceImpl
 import at.jku.enternot.service.ConnectionServiceIml
 import at.jku.enternot.service.SirenServiceImpl
@@ -20,8 +22,9 @@ class EnternotApplication : Application() {
 
     // Koin module
     val myModule: Module = org.koin.dsl.module.applicationContext {
-        viewModel { MainActivityViewModelImpl(this.androidApplication(), get()) } // get() will resolve Repository instance
+        viewModel { MainActivityViewModelImpl(this.androidApplication(), get(), get()) } // get() will resolve Repository instance
         bean { SirenServiceImpl(connectionService) as SirenService }
+        bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
         viewModel { ConfigurationActivityViewModelImpl(this.androidApplication(), get(), get()) }
         bean { ConfigurationServiceImpl() as ConfigurationService }
         bean { connectionService as ConnectionService }

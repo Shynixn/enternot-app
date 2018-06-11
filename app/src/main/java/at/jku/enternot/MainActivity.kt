@@ -1,12 +1,11 @@
 package at.jku.enternot
 
-import android.content.res.Configuration
 import android.arch.lifecycle.Observer
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -28,11 +27,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
-import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
-    private val LOG_TAG: String = MainActivity::class.java.simpleName
+    private val logTag: String = MainActivity::class.java.simpleName
     private val mainActivityViewModel: MainActivityViewModelImpl by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +43,38 @@ class MainActivity : AppCompatActivity() {
         @Suppress("PLUGIN_WARNING")
         if(isInPortrait()) {
             toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
-            toggle_button_move_camera.setOnCheckedChangeListener(this::onCamaeraMoveCheckChange)
+            toggle_button_move_camera.setOnCheckedChangeListener(this::onCameraMoveCheckChange)
             button_siren.setOnClickListener(this::onSirenClick)
+
+            mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
+                button_siren.isEnabled = isEnabled!!
+            })
+
+            mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
+                if (blinkingState == SirenBlinkingState.BLINK) {
+                    button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
+                    doAsync {
+                        uiThreadLater({ context ->
+                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
+                            } else {
+                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                            }
+                        }, 500)
+                    }
+                } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
+                    button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
+                    doAsync {
+                        uiThreadLater({ context ->
+                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
+                            } else {
+                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                            }
+                        }, 500)
+                    }
+                }
+            })
         }
 
         // Sample Play Video code
@@ -81,34 +109,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
-            button_siren.isEnabled = isEnabled!!
-        })
-
-        mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
-            if (blinkingState == SirenBlinkingState.BLINK) {
-                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-                doAsync {
-                    uiThreadLater({ context ->
-                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
-                        } else {
-                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                        }
-                    }, 500)
-                }
-            } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
-                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
-                doAsync {
-                    uiThreadLater({ context ->
-                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
-                        } else {
-                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                        }
-                    }, 500)
-                }
-            }
+        mainActivityViewModel.getCameraMovementData().observe(this, Observer {
+            // TODO: Send data to the raspberry pi
+            val (x, y, z) = it ?: Triple(0, 0, 0)
+            //Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
         })
     }
 
@@ -175,9 +179,8 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
     }
 
-    private fun onCamaeraMoveCheckChange(button: CompoundButton, isChecked: Boolean) {
-        // TODO: Implement activate camera movement
-        Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
+    private fun onCameraMoveCheckChange(button: CompoundButton, isChecked: Boolean) {
+        mainActivityViewModel.enableCameraMovement(isChecked)
     }
 
     /**
