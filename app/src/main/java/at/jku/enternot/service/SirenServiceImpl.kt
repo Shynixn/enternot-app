@@ -13,13 +13,23 @@ class SirenServiceImpl(private val connectionService: ConnectionService) : Siren
      * @throws [IOException] when the connection to the server fails.
      */
     @Throws(IOException::class)
-    override fun playSiren() {
+    override fun playSiren(): Int {
         val currentMilliSeconds = System.currentTimeMillis()
         if (currentMilliSeconds - lastTimePlayed < playingTime) {
-            return
+            return 0
         }
 
         lastTimePlayed = currentMilliSeconds
-        connectionService.post<Any>("/api/startsiren")
+        try {
+            val statusCode = connectionService.post<Any>("/api/startsiren")
+            if (statusCode != 200) {
+                lastTimePlayed = 0
+            }
+
+            return statusCode
+        } catch (e: IOException) {
+            lastTimePlayed = 0
+            throw e
+        }
     }
 }
