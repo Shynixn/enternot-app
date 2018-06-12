@@ -1,9 +1,18 @@
 package at.jku.enternot.service
 
+import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
+import com.android.volley.Request
+import com.android.volley.Response
 import java.io.IOException
+import com.android.volley.VolleyError
+import org.json.JSONObject
+import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 
-class ConnectionServiceIml(baseURL: String) : ConnectionService {
+
+class ConnectionServiceIml(private val configurationService : ConfigurationService) : ConnectionService {
 
     /**
      * Sends a post request to the given relative [url] with the optional [item] as payload.
@@ -11,7 +20,18 @@ class ConnectionServiceIml(baseURL: String) : ConnectionService {
      */
     @Throws(IOException::class)
     override fun <T> post(url: String, item: T?): Int {
-        Thread.sleep(5000)
-        throw IOException("Please implement the connection stuff.")
+        val url = "http://my-json-feed"
+
+        val jsonObjectRequest = JsonObjectRequest(Request.Method.POST, url,JSONObject(Gson().toJson(item)),
+                Response.Listener { response ->
+                    textView.text = "Response: %s".format(response.toString())
+                },
+                Response.ErrorListener { error ->
+                    // TODO: Handle error
+                }
+        )
+
+// Access the RequestQueue through your singleton class.
+        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 }

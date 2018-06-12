@@ -21,12 +21,12 @@ import org.koin.dsl.module.Module
 
 class EnternotApplication : Application() {
 
-    val connectionService = ConnectionServiceIml("ws://127.0.0.1")
     val configurationService = ConfigurationServiceImpl()
+    val connectionService = ConnectionServiceIml(configurationService)
 
     // Koin module
     val myModule: Module = org.koin.dsl.module.applicationContext {
-        viewModel { MainActivityViewModelImpl(this.androidApplication(), get() ,get() , get()) } // get() will resolve Repository instance
+        viewModel { MainActivityViewModelImpl(this.androidApplication(), get(), get(), get()) } // get() will resolve Repository instance
         bean { SirenServiceImpl(connectionService) as SirenService }
         bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
         bean { configurationService as ConfigurationService }
@@ -42,7 +42,7 @@ class EnternotApplication : Application() {
         // Start Koin
         startKoin(this, listOf(myModule))
         FirebaseMessaging.getInstance().subscribeToTopic("movement").addOnCompleteListener {
-            if(it.isSuccessful) {
+            if (it.isSuccessful) {
                 Log.d(this.javaClass.name, "Subscribed to the topic successful")
             } else {
                 Log.d(this.javaClass.name, "Could not subscribe to the topic")
