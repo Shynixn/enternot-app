@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -112,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel.getCameraMovementData().observe(this, Observer {
             // TODO: Send data to the raspberry pi
             val (x, y, z) = it ?: Triple(0, 0, 0)
-            //Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
+            Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
         })
     }
 
@@ -159,6 +160,10 @@ class MainActivity : AppCompatActivity() {
         R.id.action_settings -> {
             // TODO: Implement show settings activity.
             Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
+            true
+        }
+        R.id.action_camera_move_calibration -> {
+            showCalibrationDialog()
             true
         }
         R.id.action_voice -> {
@@ -222,4 +227,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun isInPortrait(): Boolean =
             this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    private fun showCalibrationDialog() {
+        val calibrationDialog = CalibrationDialog()
+        calibrationDialog.onStartCalibration {
+            progress_bar_calibration.visibility = View.VISIBLE
+        }
+        calibrationDialog.onFinished {
+            progress_bar_calibration.visibility = View.INVISIBLE
+        }
+        calibrationDialog.show(fragmentManager, "calibration")
+    }
 }

@@ -18,6 +18,7 @@ interface CameraMovementService {
     /**
      * Reads a set of axis data, calculate the average value for all three axis
      * and saves these values to the local storage.
+     * @param f: Callback when the calibration has finished.
      */
-    fun calibrateSensor()
+    fun calibrateSensor(f: () -> Unit)
 }

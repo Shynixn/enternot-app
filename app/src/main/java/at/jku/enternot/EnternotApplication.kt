@@ -9,6 +9,7 @@ import at.jku.enternot.service.CameraMovementServiceImpl
 import at.jku.enternot.service.ConfigurationServiceImpl
 import at.jku.enternot.service.ConnectionServiceIml
 import at.jku.enternot.service.SirenServiceImpl
+import at.jku.enternot.viewmodel.CalibrationDialogViewModelImpl
 import at.jku.enternot.viewmodel.ConfigurationActivityViewModelImpl
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
 import org.koin.android.architecture.ext.viewModel
@@ -28,6 +29,8 @@ class EnternotApplication : Application() {
         viewModel { ConfigurationActivityViewModelImpl(this.androidApplication(), get(), get()) }
         bean { ConfigurationServiceImpl() as ConfigurationService }
         bean { connectionService as ConnectionService }
+        viewModel { CalibrationDialogViewModelImpl(this.androidApplication(), get()) }
+        bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
     }
 
     override fun onCreate() {

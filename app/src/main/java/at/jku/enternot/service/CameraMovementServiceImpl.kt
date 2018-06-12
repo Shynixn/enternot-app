@@ -47,15 +47,16 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
      * Reads a set of axis data, calculate the average value for all three axis
      * and saves these values to the local storage.
      */
-    override fun calibrateSensor() {
-        sensorManager.registerListener(CalibrationListener {
-            sensorManager.unregisterListener(this, accelerometer)
+    override fun calibrateSensor(f: () -> Unit) {
+        sensorManager.registerListener(CalibrationListener { listener, data ->
+            sensorManager.unregisterListener(listener, accelerometer)
             val average = Triple(
-                    it.map { it.first }.average().toFloat(),
-                    it.map { it.second }.average().toFloat(),
-                    it.map { it.third }.average().toFloat()
+                    data.map { it.first }.average().toFloat(),
+                    data.map { it.second }.average().toFloat(),
+                    data.map { it.third }.average().toFloat()
             )
             saveCalibrationValues(average)
+            f.invoke()
         }, accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
     }
 
@@ -89,9 +90,10 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
         this.calibrationValues = Triple(x, y, z)
     }
 
-    class CalibrationListener(val callback: (data: List<Triple<Float, Float, Float>>) -> Unit)
+    class CalibrationListener(val callback: (listener: CalibrationListener,
+                                             data: List<Triple<Float, Float, Float>>) -> Unit)
         : SensorEventListener {
-        private val samples = 25
+        private val samples = 250
         private val calibrationData: MutableList<Triple<Float, Float, Float>> = mutableListOf()
 
         /**
@@ -135,7 +137,7 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
             if (calibrationData.size <= samples && event != null) {
                 calibrationData.add(Triple(event.values[0], event.values[1], event.values[2]))
             } else if (calibrationData.size >= samples) {
-                callback.invoke(calibrationData)
+                callback.invoke(this, calibrationData)
             }
         }
     }
@@ -178,7 +180,11 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
      */
     override fun onSensorChanged(event: SensorEvent?) {
         if(event != null) {
-            this.axisData.postValue(Triple(event.values[0], event.values[1], event.values[2]))
+            this.axisData.postValue(Triple(
+                    event.values[0] - calibrationValues.first,
+                    event.values[1] - calibrationValues.second,
+                    event.values[2] - calibrationValues.third
+            ))
         }
     }
 }
