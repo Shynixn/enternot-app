@@ -32,4 +32,15 @@ interface MainActivityViewModel {
      * Gets the current app configuration.
      */
     fun getConfiguration() : LiveData<Configuration>
+
+    /**
+     * Gets the accelerometer sensor data.
+     */
+    fun getCameraMovementData(): MutableLiveData<Triple<Float, Float, Float>>
+
+    /**
+     * Enables or disables the camera movement.
+     * @param b True if the camera movement should be enabled otherwise false.
+     */
+    fun enableCameraMovement(b: Boolean)
 }

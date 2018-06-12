@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import at.jku.enternot.contract.ConfigurationService
+import at.jku.enternot.contract.CameraMovementService
 import at.jku.enternot.contract.MainActivityViewModel
 import at.jku.enternot.contract.SirenService
 import at.jku.enternot.entity.Configuration
@@ -58,6 +59,13 @@ class MainActivityViewModelImpl(applicationContext: Application, private val sir
     }
 
     /**
+     * Gets the accelerometer sensor data.
+     */
+    override fun getCameraMovementData(): MutableLiveData<Triple<Float, Float, Float>> {
+        return cameraMovementService.getAxisData()
+    }
+
+    /**
      * Plays the siren at the house of the app user.
      * @throws [IOException] when the connection to the server fails.
      */
@@ -81,5 +89,13 @@ class MainActivityViewModelImpl(applicationContext: Application, private val sir
                 Log.e(logTag, "Failed to load configuration.", e)
             }
         }
+    }
+
+    /**
+     * Enables or disables the camera movement.
+     * @param b True if the camera movement should be enabled otherwise false.
+     */
+    override fun enableCameraMovement(b: Boolean) {
+        cameraMovementService.enableCameraMovement(b)
     }
 }

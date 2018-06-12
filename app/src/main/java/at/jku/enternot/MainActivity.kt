@@ -2,6 +2,8 @@ package at.jku.enternot
 
 import android.arch.lifecycle.Observer
 import android.content.res.Configuration
+import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -21,7 +23,7 @@ import at.jku.enternot.ui.CustomWebClient
 
 
 class MainActivity : AppCompatActivity() {
-    private val LOG_TAG: String = MainActivity::class.java.simpleName
+    private val logTag: String = MainActivity::class.java.simpleName
     private val mainActivityViewModel: MainActivityViewModelImpl by viewModel()
     private var cacheWebClient : CustomWebClient? = null;
 
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         @Suppress("PLUGIN_WARNING")
         if (isInPortrait()) {
             toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
-            toggle_button_move_camera.setOnCheckedChangeListener(this::onCamaeraMoveCheckChange)
+            toggle_button_move_camera.setOnCheckedChangeListener(this::onCameraMoveCheckChange)
             button_siren.setOnClickListener(this::onSirenClick)
         }
 
@@ -57,36 +59,93 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
             button_siren.isEnabled = isEnabled!!
         })
+            mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
+                button_siren.isEnabled = isEnabled!!
+            })
 
-        mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
-            if (blinkingState == SirenBlinkingState.BLINK) {
-                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-                doAsync {
-                    uiThreadLater({ context ->
-                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
-                        } else {
-                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                        }
-                    }, 500)
+            mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
+                if (blinkingState == SirenBlinkingState.BLINK) {
+                    button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
+                    doAsync {
+                        uiThreadLater({ context ->
+                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
+                            } else {
+                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                            }
+                        }, 500)
+                    }
+                } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
+                    button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
+                    doAsync {
+                        uiThreadLater({ context ->
+                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
+                            } else {
+                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                            }
+                        }, 500)
+                    }
                 }
-            } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
-                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
-                doAsync {
-                    uiThreadLater({ context ->
-                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
-                        } else {
-                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                        }
-                    }, 500)
-                }
-            }
-        })
-    }
+            })
+        }
 
     override fun onResume() {
         super.onResume()
+        // Sample Play Video code
+
+        val sourceuri = "https://www.w3schools.com/tags/mov_bbb.mp4"
+
+        val bandwidthMeter = DefaultBandwidthMeter()
+        val dataSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(this, "exoplayer2example"))
+        dataSourceFactory.defaultRequestProperties.set("basic", "asdasdsad")
+
+        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
+        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
+
+        val player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
+        player.addListener(SomeKotlinListenr())
+        view_streaming.player = player
+
+
+        val uri = Uri.parse(sourceuri)
+        val mediaSource = ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+
+        player.prepare(mediaSource)
+        player.playWhenReady = true
+
+        // Sample Play Video Code.
+
+        mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
+            if (isProgressing!!) {
+                progressbar_load_mainPage.visibility = View.VISIBLE
+            } else {
+                progressbar_load_mainPage.visibility = View.GONE
+            }
+        })
+
+        mainActivityViewModel.getCameraMovementData().observe(this, Observer {
+            // TODO: Send data to the raspberry pi
+            val (x, y, z) = it ?: Triple(0, 0, 0)
+            Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
+        })
+    }
+
+    private class SomeKotlinListenr : Player.EventListener {
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
+        }
+
+        override fun onSeekProcessed() {
+        }
+
+        override fun onTracksChanged(trackGroups: TrackGroupArray?, trackSelections: TrackSelectionArray?) {
+        }
+
+        override fun onPlayerError(error: ExoPlaybackException?) {
+        }
+
+        override fun onLoadingChanged(isLoading: Boolean) {
+        }
 
         // Reconnect to server.
         if (cacheWebClient != null) {
@@ -115,6 +174,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
             true
         }
+        R.id.action_camera_move_calibration -> {
+            showCalibrationDialog()
+            true
+        }
         R.id.action_voice -> {
             item.isChecked = !item.isChecked
             true
@@ -133,9 +196,8 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
     }
 
-    private fun onCamaeraMoveCheckChange(button: CompoundButton, isChecked: Boolean) {
-        // TODO: Implement activate camera movement
-        Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
+    private fun onCameraMoveCheckChange(button: CompoundButton, isChecked: Boolean) {
+        mainActivityViewModel.enableCameraMovement(isChecked)
     }
 
     /**
@@ -177,4 +239,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun isInPortrait(): Boolean =
             this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    private fun showCalibrationDialog() {
+        val calibrationDialog = CalibrationDialog()
+        calibrationDialog.onStartCalibration {
+            progress_bar_calibration.visibility = View.VISIBLE
+        }
+        calibrationDialog.onFinished {
+            progress_bar_calibration.visibility = View.INVISIBLE
+        }
+        calibrationDialog.show(fragmentManager, "calibration")
+    }
 }

@@ -14,4 +14,8 @@
     <string name="save">Save</string>
     <string name="preference_file_key">enternot_configuration_values</string>
     <string name="siren_icon">Siren Icon</string>
+    <string name="calibration_dialog_message">Lay the phone down on a table or a flat area. Then press start to start the calibration.</string>
+    <string name="calibration_dialog_title">Camera Movement Calibration</string>
+    <string name="calibration_dialog_positive_button">Start</string>
+    <string name="calibration_dialog_negative_button">Cancel</string>
 </resources>

@@ -7,5 +7,8 @@
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="Settings"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_camera_move_calibration"
+        android:title="Calibrate Camera Movement"/>
 
 </menu>
