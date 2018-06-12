@@ -69,8 +69,6 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:0.10.4"
     implementation "org.koin:koin-android-architecture:0.9.3"
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.7.0'
-
     testImplementation group: 'org.mockito', name: 'mockito-all', version: '2.0.2-beta'
 }
 

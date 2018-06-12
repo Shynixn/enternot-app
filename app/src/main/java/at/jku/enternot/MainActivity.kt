@@ -1,7 +1,6 @@
 package at.jku.enternot
 
 import android.arch.lifecycle.Observer
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -12,27 +11,21 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
+import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
 import at.jku.enternot.extension.uiThreadLater
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.ExtractorMediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
+import at.jku.enternot.ui.CustomWebClient
 
 
 class MainActivity : AppCompatActivity() {
     private val logTag: String = MainActivity::class.java.simpleName
     private val mainActivityViewModel: MainActivityViewModelImpl by viewModel()
+    private var cacheWebClient : CustomWebClient? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,11 +35,30 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         @Suppress("PLUGIN_WARNING")
-        if(isInPortrait()) {
+        if (isInPortrait()) {
             toggle_button_voice.setOnCheckedChangeListener(this::onVoiceCheckChange)
             toggle_button_move_camera.setOnCheckedChangeListener(this::onCameraMoveCheckChange)
             button_siren.setOnClickListener(this::onSirenClick)
+        }
 
+        mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
+            if (isProgressing!!) {
+                progressbar_load_mainPage.visibility = View.VISIBLE
+            } else {
+                progressbar_load_mainPage.visibility = View.GONE
+            }
+        })
+
+        mainActivityViewModel.getConfiguration().observe(this, Observer { config ->
+            if (config != null) {
+                cacheWebClient = CustomWebClient(this, config)
+                webview.webViewClient = cacheWebClient
+            }
+        })
+
+        mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
+            button_siren.isEnabled = isEnabled!!
+        })
             mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
                 button_siren.isEnabled = isEnabled!!
             })
@@ -78,27 +90,9 @@ class MainActivity : AppCompatActivity() {
             })
         }
 
+    override fun onResume() {
+        super.onResume()
         // Sample Play Video code
-
-        val sourceuri = "https://www.w3schools.com/tags/mov_bbb.mp4"
-
-        val bandwidthMeter = DefaultBandwidthMeter()
-        val dataSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(this, "exoplayer2example"))
-        dataSourceFactory.defaultRequestProperties.set("basic", "asdasdsad")
-
-        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
-        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-
-        val player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
-        player.addListener(SomeKotlinListenr())
-        view_streaming.player = player
-
-
-        val uri = Uri.parse(sourceuri)
-        val mediaSource = ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
-
-        player.prepare(mediaSource)
-        player.playWhenReady = true
 
         // Sample Play Video Code.
 
@@ -117,37 +111,13 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private class SomeKotlinListenr : Player.EventListener {
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
-        }
+    override fun onDestroy() {
+        super.onDestroy()
 
-        override fun onSeekProcessed() {
+        // Cleanup webview.
+        if (cacheWebClient != null) {
+            cacheWebClient!!.close()
         }
-
-        override fun onTracksChanged(trackGroups: TrackGroupArray?, trackSelections: TrackSelectionArray?) {
-        }
-
-        override fun onPlayerError(error: ExoPlaybackException?) {
-        }
-
-        override fun onLoadingChanged(isLoading: Boolean) {
-        }
-
-        override fun onPositionDiscontinuity(reason: Int) {
-        }
-
-        override fun onRepeatModeChanged(repeatMode: Int) {
-        }
-
-        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-        }
-
-        override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
-        }
-
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -226,7 +196,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isInPortrait(): Boolean =
-            this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            this.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
 
     private fun showCalibrationDialog() {
         val calibrationDialog = CalibrationDialog()

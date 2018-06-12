@@ -1,6 +1,8 @@
 package at.jku.enternot.contract
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
 
 interface MainActivityViewModel {
@@ -25,6 +27,11 @@ interface MainActivityViewModel {
      * Gets the blinking state of the siren.
      */
     fun getSirenBlinkingState(): MutableLiveData<SirenBlinkingState>
+
+    /**
+     * Gets the current app configuration.
+     */
+    fun getConfiguration() : LiveData<Configuration>
 
     /**
      * Gets the accelerometer sensor data.
