@@ -14,4 +14,10 @@ interface CameraMovementService {
      * Gets the axis moving data.
      */
     fun getAxisData(): MutableLiveData<Triple<Float, Float, Float>>
+
+    /**
+     * Reads a set of axis data, calculate the average value for all three axis
+     * and saves these values to the local storage.
+     */
+    fun calibrateSensor()
 }
