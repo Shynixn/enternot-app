@@ -14,7 +14,7 @@ import at.jku.enternot.entity.SirenBlinkingState
 import org.jetbrains.anko.doAsync
 import java.io.IOException
 
-class MainActivityViewModelImpl(applicationContext: Application, private val sirenService: SirenService, private val configurationService: ConfigurationService) : AndroidViewModel(applicationContext), MainActivityViewModel {
+class MainActivityViewModelImpl(applicationContext: Application, private val sirenService: SirenService, private val configurationService: ConfigurationService, private val cameraMovementService: CameraMovementService) : AndroidViewModel(applicationContext), MainActivityViewModel {
     private val logTag: String = MainActivityViewModelImpl::class.java.simpleName
     private var progressingLoad: MutableLiveData<Boolean> = MutableLiveData()
     private var blinkingState: MutableLiveData<SirenBlinkingState> = MutableLiveData()

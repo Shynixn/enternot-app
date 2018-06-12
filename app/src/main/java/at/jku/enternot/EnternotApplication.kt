@@ -26,8 +26,7 @@ class EnternotApplication : Application() {
 
     // Koin module
     val myModule: Module = org.koin.dsl.module.applicationContext {
-        viewModel { MainActivityViewModelImpl(this.androidApplication(), get() ,get()) } // get() will resolve Repository instance
-        viewModel { MainActivityViewModelImpl(this.androidApplication(), get(), get()) } // get() will resolve Repository instance
+        viewModel { MainActivityViewModelImpl(this.androidApplication(), get() ,get() , get()) } // get() will resolve Repository instance
         bean { SirenServiceImpl(connectionService) as SirenService }
         bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
         bean { configurationService as ConfigurationService }

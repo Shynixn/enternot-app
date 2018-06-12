@@ -1,17 +1,17 @@
 package at.jku.enternot
 
 import android.arch.lifecycle.Observer
-import android.content.res.Configuration
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
+import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
 import at.jku.enternot.extension.uiThreadLater
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
@@ -94,26 +94,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         // Sample Play Video code
 
-        val sourceuri = "https://www.w3schools.com/tags/mov_bbb.mp4"
-
-        val bandwidthMeter = DefaultBandwidthMeter()
-        val dataSourceFactory = DefaultHttpDataSourceFactory(Util.getUserAgent(this, "exoplayer2example"))
-        dataSourceFactory.defaultRequestProperties.set("basic", "asdasdsad")
-
-        val videoTrackSelectionFactory = AdaptiveTrackSelection.Factory(bandwidthMeter)
-        val trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-
-        val player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
-        player.addListener(SomeKotlinListenr())
-        view_streaming.player = player
-
-
-        val uri = Uri.parse(sourceuri)
-        val mediaSource = ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
-
-        player.prepare(mediaSource)
-        player.playWhenReady = true
-
         // Sample Play Video Code.
 
         mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
@@ -129,28 +109,6 @@ class MainActivity : AppCompatActivity() {
             val (x, y, z) = it ?: Triple(0, 0, 0)
             Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
         })
-    }
-
-    private class SomeKotlinListenr : Player.EventListener {
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
-        }
-
-        override fun onSeekProcessed() {
-        }
-
-        override fun onTracksChanged(trackGroups: TrackGroupArray?, trackSelections: TrackSelectionArray?) {
-        }
-
-        override fun onPlayerError(error: ExoPlaybackException?) {
-        }
-
-        override fun onLoadingChanged(isLoading: Boolean) {
-        }
-
-        // Reconnect to server.
-        if (cacheWebClient != null) {
-            webview.reload()
-        }
     }
 
     override fun onDestroy() {
@@ -238,7 +196,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isInPortrait(): Boolean =
-            this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            this.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
 
     private fun showCalibrationDialog() {
         val calibrationDialog = CalibrationDialog()
