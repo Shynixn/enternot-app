@@ -17,13 +17,15 @@ import org.koin.dsl.module.Module
 class EnternotApplication : Application() {
 
     val connectionService = ConnectionServiceIml("ws://127.0.0.1")
+    val configurationService = ConfigurationServiceImpl()
 
     // Koin module
     val myModule: Module = org.koin.dsl.module.applicationContext {
-        viewModel { MainActivityViewModelImpl(this.androidApplication(), get()) } // get() will resolve Repository instance
+        viewModel { MainActivityViewModelImpl(this.androidApplication(), get() ,get()) } // get() will resolve Repository instance
         bean { SirenServiceImpl(connectionService) as SirenService }
+        bean { configurationService as ConfigurationService }
         viewModel { ConfigurationActivityViewModelImpl(this.androidApplication(), get(), get()) }
-        bean { ConfigurationServiceImpl() as ConfigurationService }
+        bean { configurationService as ConfigurationService }
         bean { connectionService as ConnectionService }
     }
 
