@@ -25,4 +25,15 @@ interface MainActivityViewModel {
      * Gets the blinking state of the siren.
      */
     fun getSirenBlinkingState(): MutableLiveData<SirenBlinkingState>
+
+    /**
+     * Gets the accelerometer sensor data.
+     */
+    fun getCameraMovementData(): MutableLiveData<Triple<Float, Float, Float>>
+
+    /**
+     * Enables or disables the camera movement.
+     * @param b True if the camera movement should be enabled otherwise false.
+     */
+    fun enableCameraMovement(b: Boolean)
 }

@@ -1,4 +1,4 @@
-package at.jku.enternot.services
+package at.jku.enternot.service
 
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService

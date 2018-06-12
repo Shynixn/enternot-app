@@ -6,9 +6,6 @@
     <group android:translateX="15.761194"
             android:translateY="15.761194">
       <path
-          android:pathData="M31.833,32m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0"
-          android:fillColor="#4F5D73"/>
-      <path
           android:pathData="M24,16h6v14h-6z"
           android:fillColor="#F5CF87"/>
       <path
