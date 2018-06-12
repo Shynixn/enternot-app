@@ -1,6 +1,7 @@
 package at.jku.enternot
 
 import android.app.Application
+import android.util.Log
 import at.jku.enternot.contract.CameraMovementService
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
@@ -12,6 +13,7 @@ import at.jku.enternot.service.SirenServiceImpl
 import at.jku.enternot.viewmodel.CalibrationDialogViewModelImpl
 import at.jku.enternot.viewmodel.ConfigurationActivityViewModelImpl
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
+import com.google.firebase.messaging.FirebaseMessaging
 import org.koin.android.architecture.ext.viewModel
 import org.koin.android.ext.android.startKoin
 import org.koin.android.ext.koin.androidApplication
@@ -37,5 +39,12 @@ class EnternotApplication : Application() {
         super.onCreate()
         // Start Koin
         startKoin(this, listOf(myModule))
+        FirebaseMessaging.getInstance().subscribeToTopic("movement").addOnCompleteListener {
+            if(it.isSuccessful) {
+                Log.d(this.javaClass.name, "Subscribed to the topic successful")
+            } else {
+                Log.d(this.javaClass.name, "Could not subscribe to the topic")
+            }
+        }
     }
 }
