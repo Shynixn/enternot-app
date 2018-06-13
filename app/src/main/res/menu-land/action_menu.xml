@@ -9,6 +9,9 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_camera_move_calibration"
+        android:title="Calibrate Camera Movement"/>
+    <item
         android:id="@+id/action_voice"
         android:icon="@drawable/ic_voice_off_white_24dp"
         android:checkable="true"
