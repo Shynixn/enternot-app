@@ -21,12 +21,13 @@ class SirenServiceImpl(private val connectionService: ConnectionService) : Siren
 
         lastTimePlayed = currentMilliSeconds
         try {
-            val statusCode = connectionService.post<Any>("/api/startsiren")
+         /*   val statusCode = connectionService.post<Any>("/api/startsiren")
             if (statusCode != 200) {
                 lastTimePlayed = 0
             }
 
-            return statusCode
+            return statusCode*/
+            return 0
         } catch (e: IOException) {
             lastTimePlayed = 0
             throw e

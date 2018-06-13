@@ -9,6 +9,7 @@ import at.jku.enternot.contract.ConfigurationActivityViewModel
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
 import at.jku.enternot.entity.Configuration
+import at.jku.enternot.entity.Response
 import org.jetbrains.anko.doAsync
 import java.io.IOException
 
@@ -39,12 +40,12 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
     /**
      * Checks if the entered configuration can be used to connect to a server.
      */
-    override fun testConnection(configuration: Configuration): Int {
+    override fun testConnection(configuration: Configuration): Response<String> {
         return try {
-            connectionService.post<Void>("/api/testconnect")
-        } catch (e: IOException) {
+            connectionService.get("/status", String::class.java, getApplication())
+        } catch (e: Exception) {
             Log.e(logTag, "Failed to connect to the server.", e)
-            500
+            Response(500)
         }
     }
 
