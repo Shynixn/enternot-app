@@ -18,6 +18,11 @@ interface ConfigurationActivityViewModel {
     fun getConfiguration(): LiveData<Configuration>
 
     /**
+     * Gets the current used fragement for displaying data.
+     */
+    fun getFragementNumber(): MutableLiveData<Int>
+
+    /**
      * Saves the given configuration.
      */
     fun saveConfiguration(configuration: Configuration)

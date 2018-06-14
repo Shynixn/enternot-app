@@ -9,7 +9,7 @@
     <string name="hostname">Hostname</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="test_connection">Test Connection</string>
+    <string name="test_connection">Validate Connection</string>
     <string name="enternot_settings">Enternot Settings</string>
     <string name="save">Save</string>
     <string name="preference_file_key">enternot_configuration_values</string>

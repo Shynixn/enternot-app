@@ -10,9 +10,9 @@ import android.view.ViewGroup
 /*
  * A simple [Fragment] subclass.
  */
-class WelcomeFragment : Fragment() {
+class ConfigureFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_welcome, container, false)
+        return inflater.inflate(R.layout.fragment_testconnection, container, false)
     }
 }

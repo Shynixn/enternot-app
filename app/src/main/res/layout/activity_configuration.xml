@@ -5,10 +5,11 @@
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".ConfigurationActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_configuration"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?android:attr/colorPrimary"
@@ -19,19 +20,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <ScrollView
+        android:id="@+id/fragment_container_configurationPage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <include
-            layout="@layout/fragment_welcome" />
+        <include layout="@layout/fragment_welcome" />
 
 
-    </FrameLayout>
+    </ScrollView>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

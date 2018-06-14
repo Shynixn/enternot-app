@@ -11,7 +11,8 @@ import android.view.View
 import android.widget.Toast
 import at.jku.enternot.entity.Configuration
 import at.jku.enternot.viewmodel.ConfigurationActivityViewModelImpl
-import kotlinx.android.synthetic.main.content_configuration.*
+import kotlinx.android.synthetic.main.activity_configuration.*
+import kotlinx.android.synthetic.main.fragment_testconnection.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
@@ -30,39 +31,53 @@ class ConfigurationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configuration)
 
-        toolbar.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white))
-        setSupportActionBar(toolbar)
+        toolbar_configuration.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white))
+        setSupportActionBar(toolbar_configuration)
 
-        // endregion
+        println("MEME")
 
-        // region Listener
-      /*  this.button_testConnection_configurationPage.setOnClickListener(testConnectionListener)
-        // endregion
-
-        configurationViewModel.getConfiguration().observe(this, Observer { config ->
-            if (config != null) {
-                this.editText_host_configurationPage.setText(config.hostname)
-                this.editText_username_configurationPage.setText(config.username)
-                this.editText_password_configurationPage.setText(config.password)
-            }
-        })
-
-        configurationViewModel.getProgressingState().observe(this, Observer { isProgressing ->
-            if (isProgressing!!) {
-                progressbar_testConnection_configurationPage.visibility = View.VISIBLE
-                button_testConnection_configurationPage.isEnabled = false
+        configurationViewModel.getFragementNumber().observe(this, Observer { number ->
+            if (number == 1) {
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fragment_container_configurationPage, WelcomeFragment())
+                transaction.commit()
             } else {
-                progressbar_testConnection_configurationPage.visibility = View.INVISIBLE
-                button_testConnection_configurationPage.isEnabled = true
+
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fragment_container_configurationPage,ConfigureFragment())
+                transaction.commit()
+
+                // region Listener
+                this.button_testConnection_configurationPage.setOnClickListener(testConnectionListener)
+                // endregion
+
+                configurationViewModel.getConfiguration().observe(this, Observer { config ->
+                    if (config != null) {
+                        this.editText_host_configurationPage.setText(config.hostname)
+                        this.editText_username_configurationPage.setText(config.username)
+                        this.editText_password_configurationPage.setText(config.password)
+                    }
+                })
+
+                configurationViewModel.getProgressingState().observe(this, Observer { isProgressing ->
+                    if (isProgressing!!) {
+                        progressbar_testConnection_configurationPage.visibility = View.VISIBLE
+                        button_testConnection_configurationPage.isEnabled = false
+                    } else {
+                        progressbar_testConnection_configurationPage.visibility = View.INVISIBLE
+                        button_testConnection_configurationPage.isEnabled = true
+                    }
+                });
             }
-        })*/
+        });
+
     }
 
     /**
      * Android override createOptionsMenu.
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        toolbar.inflateMenu(R.menu.configuration_menu)
+        toolbar_configuration.inflateMenu(R.menu.configuration_menu)
         return true
     }
 
