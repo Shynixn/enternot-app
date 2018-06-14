@@ -36,7 +36,7 @@ class ConfigurationActivity : AppCompatActivity() {
         // endregion
 
         // region Listener
-        this.button_testConnection_configurationPage.setOnClickListener(testConnectionListener)
+      /*  this.button_testConnection_configurationPage.setOnClickListener(testConnectionListener)
         // endregion
 
         configurationViewModel.getConfiguration().observe(this, Observer { config ->
@@ -55,7 +55,7 @@ class ConfigurationActivity : AppCompatActivity() {
                 progressbar_testConnection_configurationPage.visibility = View.INVISIBLE
                 button_testConnection_configurationPage.isEnabled = true
             }
-        })
+        })*/
     }
 
     /**

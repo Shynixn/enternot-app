@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_back"
+        android:icon="@drawable/white_arrow_back"
+
+        android:enabled="false"
+        android:title="Back" />
+
+    <item
+        android:id="@+id/navigation_next"
+        android:enabled="true"
+        android:iconTint="@color/colorAccent"
+        android:icon="@drawable/white_arrow_forward"
+        android:title="Next" />
+</menu>
