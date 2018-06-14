@@ -1,5 +1,6 @@
 package at.jku.enternot.contract
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import at.jku.enternot.entity.SirenBlinkingState
 
@@ -36,4 +37,15 @@ interface MainActivityViewModel {
      * @param b True if the camera movement should be enabled otherwise false.
      */
     fun enableCameraMovement(b: Boolean)
+
+    /**
+     * Gets the recorded audio data.
+     */
+    fun getAudioData(): LiveData<ByteArray>
+
+    /**
+     * Enables or disables the voice recording.
+     * @param b True if the voice recording should be enabled otherwise false.
+     */
+    fun enableVoiceRecording(b: Boolean)
 }
