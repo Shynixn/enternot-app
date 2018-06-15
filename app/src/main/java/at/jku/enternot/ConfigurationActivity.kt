@@ -3,8 +3,12 @@ package at.jku.enternot
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.internal.BottomNavigationItemView
+import android.support.design.internal.BottomNavigationMenu
+import android.support.design.widget.BottomNavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.transition.Transition
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,6 +23,7 @@ import org.koin.android.architecture.ext.viewModel
 
 class ConfigurationActivity : AppCompatActivity() {
     private val configurationViewModel: ConfigurationActivityViewModelImpl by viewModel()
+    private var selectedFragment : Int = 0
 
     //region Android
 
@@ -34,18 +39,33 @@ class ConfigurationActivity : AppCompatActivity() {
         toolbar_configuration.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white))
         setSupportActionBar(toolbar_configuration)
 
-        println("MEME")
+
+
 
         configurationViewModel.getFragementNumber().observe(this, Observer { number ->
+            selectedFragment = number!!
             if (number == 1) {
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.fragment_container_configurationPage, WelcomeFragment())
-                transaction.commit()
+                transaction.commitNow()
+
+                navigation.menu.getItem(1).setEnabled(true)
+                navigation.menu.getItem(1).setChecked(false)
+                navigation.menu.getItem(0).setEnabled(false)
+                navigation.menu.getItem(0).setChecked(false)
+
+
+                navigation.setOnNavigationItemReselectedListener(bottomNavigationListener)
             } else {
 
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.fragment_container_configurationPage,ConfigureFragment())
-                transaction.commit()
+                transaction.replace(R.id.fragment_container_configurationPage, ConfigureFragment())
+                transaction.commitNow()
+
+                navigation.menu.getItem(1).setEnabled(false)
+                navigation.menu.getItem(1).setChecked(false)
+                navigation.menu.getItem(0).setEnabled(true)
+                navigation.menu.getItem(0).setChecked(false)
 
                 // region Listener
                 this.button_testConnection_configurationPage.setOnClickListener(testConnectionListener)
@@ -73,26 +93,31 @@ class ConfigurationActivity : AppCompatActivity() {
 
     }
 
-    /**
-     * Android override createOptionsMenu.
-     */
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        toolbar_configuration.inflateMenu(R.menu.configuration_menu)
-        return true
-    }
 
-    /**
-     * Android override onOptionsItemSelected.
-     */
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menuItem_acceptSettings_configurationPage) {
-            saveConfigurationListener.onClick(item.actionView)
+    private val bottomNavigationListener = BottomNavigationView.OnNavigationItemReselectedListener { menuItem ->
+        if(menuItem.itemId == R.id.navigation_next)
+        {
+            if(selectedFragment == 1)
+            {
+                this.configurationViewModel.getFragementNumber().value = 2
+            }
+            else
+            {
+                this.configurationViewModel.getFragementNumber().value = 1
+            }
         }
-
-        return super.onOptionsItemSelected(item)
+        else if(menuItem.itemId == R.id.navigation_back)
+        {
+            if(selectedFragment == 2)
+            {
+                this.configurationViewModel.getFragementNumber().value = 1
+            }
+            else
+            {
+                this.configurationViewModel.getFragementNumber().value = 2
+            }
+        }
     }
-
-    // endregion
 
     /**
      * When the view gets clicked the app checks for the server if it can connect.
