@@ -2,8 +2,10 @@ package at.jku.enternot.contract
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
+import java.io.IOException
 
 interface MainActivityViewModel {
 
@@ -43,4 +45,9 @@ interface MainActivityViewModel {
      * @param b True if the camera movement should be enabled otherwise false.
      */
     fun enableCameraMovement(b: Boolean)
+
+    /**
+     * Saves the given configuration.
+     */
+    fun saveConfiguration(configuration: Configuration)
 }

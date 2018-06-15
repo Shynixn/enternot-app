@@ -32,7 +32,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/background_light</item>
-        <item name="android:background">@android:color/holo_orange_dark</item>
+        <item name="android:background">@drawable/round_button</item>
     </style>
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
