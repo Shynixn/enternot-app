@@ -1,7 +1,7 @@
 package at.jku.enternot
 
 import android.arch.lifecycle.Observer
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -12,16 +12,14 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
-import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
 import at.jku.enternot.extension.uiThreadLater
+import at.jku.enternot.ui.CustomWebClient
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
-import at.jku.enternot.ui.CustomWebClient
-
 
 class MainActivity : AppCompatActivity() {
     private val logTag: String = MainActivity::class.java.simpleName
@@ -129,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_settings -> {
-            val builder = AlertDialog.Builder(this)
+            val builder = AlertDialog.Builder(this, R.style.AlertDialogCustom)
             builder.setTitle("Reset settings?")
                     .setMessage("This will disconnect you from your server completely and reset all settings.")
                     .setPositiveButton("ACCEPT", { _, _ ->
@@ -137,6 +135,9 @@ class MainActivity : AppCompatActivity() {
                         config.configured = false
                         this.mainActivityViewModel.saveConfiguration(config)
                         finish()
+                        val intent = Intent(this, ConfigurationActivity::class.java)
+                        intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NO_HISTORY
+                        startActivity(intent)
                     })
                     .setNegativeButton("CANCEL", { _, _ ->
                     })
