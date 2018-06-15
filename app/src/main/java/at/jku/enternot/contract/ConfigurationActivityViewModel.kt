@@ -18,6 +18,11 @@ interface ConfigurationActivityViewModel {
     fun getConfiguration(): LiveData<Configuration>
 
     /**
+     * Gets the state if connection is successful.
+     */
+    fun getSuccessfullState(): MutableLiveData<Boolean>
+
+    /**
      * Saves the given configuration.
      */
     fun saveConfiguration(configuration: Configuration)

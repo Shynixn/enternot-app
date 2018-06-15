@@ -17,6 +17,7 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
     private val logTag: String = ConfigurationActivityViewModelImpl::class.java.simpleName
     private var configuration: MutableLiveData<Configuration>? = null
     private var progressingLoad: MutableLiveData<Boolean> = MutableLiveData()
+    private var successFulState: MutableLiveData<Boolean>? = null
 
     /**
      * Gets the configuration of the app.
@@ -28,6 +29,18 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
         }
 
         return configuration!!
+    }
+
+    /**
+     * Gets the state if connection is successful.
+     */
+    override fun getSuccessfullState(): MutableLiveData<Boolean> {
+        if (successFulState == null) {
+            successFulState = MutableLiveData()
+            successFulState!!.value = false
+        }
+
+        return successFulState!!
     }
 
     /**

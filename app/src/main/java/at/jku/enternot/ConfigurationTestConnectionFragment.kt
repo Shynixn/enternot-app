@@ -1,7 +1,6 @@
 package at.jku.enternot
 
 import android.arch.lifecycle.Observer
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -67,6 +66,20 @@ class ConfigurationTestConnectionFragment : Fragment() {
             }
         })
 
+        configurationViewModel.getSuccessfullState().observe(this, Observer { isSuccessful ->
+            if (isSuccessful!!) {
+                this.textView_success_configurationPage.visibility = View.VISIBLE
+                activity.navigation_configuration.menu.getItem(1).isEnabled = true
+                activity.navigation_configuration.menu.getItem(1).isChecked = true
+            } else {
+                this.textView_success_configurationPage.visibility = View.GONE
+                activity.navigation_configuration.menu.getItem(1).isEnabled = false
+                activity.navigation_configuration.menu.getItem(1).isChecked = false
+                activity.navigation_configuration.menu.getItem(0).isEnabled = true
+                activity.navigation_configuration.menu.getItem(0).isChecked = false
+            }
+        })
+
         configurationViewModel.getProgressingState().observe(this, Observer { isProgressing ->
             if (isProgressing!!) {
                 progressbar_testConnection_configurationPage.visibility = View.VISIBLE
@@ -93,7 +106,13 @@ class ConfigurationTestConnectionFragment : Fragment() {
 
                 uiThread { context ->
                     when (response.statusCode) {
-                        200 -> Toast.makeText(context, response.content!!, Toast.LENGTH_LONG).show()
+                        200 -> {
+                            Toast.makeText(context, response.content!!, Toast.LENGTH_LONG).show()
+                            configuration.configured = true
+                            configurationViewModel.saveConfiguration(configuration)
+
+                            configurationViewModel.getSuccessfullState().value = true
+                        }
                         401 -> Toast.makeText(context, "Entered username or password is invalid", Toast.LENGTH_LONG).show()
                         else -> Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
                     }
@@ -101,21 +120,6 @@ class ConfigurationTestConnectionFragment : Fragment() {
                     configurationViewModel.getProgressingState().value = false
                 }
             }
-        }
-    }
-
-    /**
-     * Saves the current [Configuration] on screen.
-     */
-    private fun saveCurrenConfiguration() {
-        val configuration = getCurrentConfiguration()
-
-        if (configuration != null) {
-            configurationViewModel.saveConfiguration(configuration)
-
-            val intent = Intent(this.context, MainActivity::class.java)
-            intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NO_HISTORY
-            startActivity(intent)
         }
     }
 
@@ -132,7 +136,7 @@ class ConfigurationTestConnectionFragment : Fragment() {
             username.isEmpty() -> Toast.makeText(this.context, "Please enter a username", Toast.LENGTH_LONG).show()
             password.isEmpty() -> Toast.makeText(this.context, "Please enter a password", Toast.LENGTH_LONG).show()
             else -> {
-                return Configuration(hostname, username, password)
+                return Configuration(hostname, username, password, false)
             }
         }
 

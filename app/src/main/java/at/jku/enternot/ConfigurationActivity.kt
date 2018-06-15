@@ -1,13 +1,19 @@
 package at.jku.enternot
 
+import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import at.jku.enternot.extension.isOpen
+import at.jku.enternot.viewmodel.ConfigurationActivityViewModelImpl
 import kotlinx.android.synthetic.main.activity_configuration.*
+import org.koin.android.architecture.ext.viewModel
 
 class ConfigurationActivity : AppCompatActivity() {
+    private val configurationViewModel: ConfigurationActivityViewModelImpl by viewModel()
+
     /**
      * Android override create.
      */
@@ -20,9 +26,15 @@ class ConfigurationActivity : AppCompatActivity() {
         setSupportActionBar(toolbar_configuration)
         navigation_configuration.setOnNavigationItemReselectedListener(bottomNavigationListener)
 
-        if (supportFragmentManager.findFragmentByTag(ConfigurationWelcomeFragment.TAG) == null && supportFragmentManager.findFragmentByTag(ConfigurationTestConnectionFragment.TAG) == null) {
-            openWelcomeFragment()
-        }
+        configurationViewModel.getConfiguration().observe(this, Observer { config ->
+            if (config != null && config.configured) {
+                openMainActivity()
+            } else {
+                if (supportFragmentManager.findFragmentByTag(ConfigurationWelcomeFragment.TAG) == null && supportFragmentManager.findFragmentByTag(ConfigurationTestConnectionFragment.TAG) == null) {
+                    openWelcomeFragment()
+                }
+            }
+        })
     }
 
     /**
@@ -33,16 +45,24 @@ class ConfigurationActivity : AppCompatActivity() {
 
             if (supportFragmentManager.isOpen(ConfigurationWelcomeFragment.TAG)) {
                 openTestConnectionFragment()
-            }
-
-            if (supportFragmentManager.isOpen(ConfigurationTestConnectionFragment.TAG)) {
-                //   openTestConnectionFragment()
+            } else if (supportFragmentManager.isOpen(ConfigurationTestConnectionFragment.TAG)) {
+                openMainActivity()
             }
         } else if (menuItem.itemId == R.id.navigation_back) {
             if (supportFragmentManager.isOpen(ConfigurationTestConnectionFragment.TAG)) {
                 openWelcomeFragment()
             }
         }
+    }
+
+    /**
+     * Opens the main activity.
+     */
+    private fun openMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NO_HISTORY
+        startActivity(intent)
+        finish()
     }
 
     /**
