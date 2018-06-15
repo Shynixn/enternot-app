@@ -54,6 +54,9 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
         val configuration = configurationService.getConfiguration(context)
                 ?: throw IllegalArgumentException("Configuration cannot be null!")
 
+        Thread.sleep(5000)
+
+
         val hostnameURL = URL(configuration.hostname + url)
         val conn = hostnameURL.openConnection() as HttpURLConnection
         val basicAuth = "Basic " + String(Base64.encode((configuration.username + ":" + configuration.password).toByteArray(Charsets.UTF_8), Base64.DEFAULT))

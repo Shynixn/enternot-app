@@ -17,7 +17,6 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
     private val logTag: String = ConfigurationActivityViewModelImpl::class.java.simpleName
     private var configuration: MutableLiveData<Configuration>? = null
     private var progressingLoad: MutableLiveData<Boolean> = MutableLiveData()
-    private var fragementState: MutableLiveData<Int>? = null
 
     /**
      * Gets the configuration of the app.
@@ -29,18 +28,6 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
         }
 
         return configuration!!
-    }
-
-    /**
-     * Gets the current used fragement for displaying data.
-     */
-    override fun getFragementNumber(): MutableLiveData<Int> {
-        if (fragementState == null) {
-            fragementState = MutableLiveData<Int>()
-            fragementState!!.value = 1
-        }
-
-        return fragementState!!
     }
 
     /**
