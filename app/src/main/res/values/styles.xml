@@ -35,6 +35,10 @@
         <item name="android:background">@drawable/round_button</item>
     </style>
 
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent">@android:color/black</item>
+    </style>
+
     <style name="AppActionBar">
         <item name="android:height">50dp</item>
     </style>

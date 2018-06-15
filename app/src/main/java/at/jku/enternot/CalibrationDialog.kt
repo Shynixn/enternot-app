@@ -36,7 +36,7 @@ class CalibrationDialog : DialogFragment() {
      * @return Return a new Dialog instance to be displayed by the Fragment.
      */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(activity)
+        val builder = AlertDialog.Builder(activity, R.style.AlertDialogCustom)
         builder.setTitle(R.string.calibration_dialog_title)
                 .setMessage(R.string.calibration_dialog_message)
                 .setPositiveButton(R.string.calibration_dialog_positive_button, { _, _ ->
