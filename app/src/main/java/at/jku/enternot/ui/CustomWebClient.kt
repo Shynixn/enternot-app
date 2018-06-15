@@ -16,7 +16,7 @@ class CustomWebClient(private var context: MainActivity?, private val configurat
      * Loads the webClient url on start.
      */
     init {
-        context!!.webview.loadUrl(configuration.hostname)
+        context!!.webview.loadUrl(configuration.hostname + "/camera/stream")
     }
 
     /**

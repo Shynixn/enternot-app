@@ -88,7 +88,7 @@ class TConfigurationService {
         `when`(context.getSharedPreferences(Matchers.anyString(), Matchers.anyInt())).thenReturn(sharedPreferences)
         `when`(context.getString(Matchers.anyInt())).thenReturn("sample")
 
-        val expectedConfiguration = Configuration("samplehostname.org", "Bobder", "Baumeister")
+        val expectedConfiguration = Configuration("samplehostname.org", "Bobder", "Baumeister", false)
 
 
         // Act
@@ -114,7 +114,7 @@ class TConfigurationService {
         // Arrange
         val classUnderTest = createWithDependencies()
         val context = mock(Context::class.java)
-        val configuration = Configuration("host", "super", "man")
+        val configuration = Configuration("host", "super", "man", false)
         val sharedPreferences = mock(SharedPreferences::class.java)
         val sharedPreferencesEditor = mock(SharedPreferences.Editor::class.java)
         var currentValue: String? = null
