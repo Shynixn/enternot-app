@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
@@ -25,7 +26,7 @@ import at.jku.enternot.ui.CustomWebClient
 class MainActivity : AppCompatActivity() {
     private val logTag: String = MainActivity::class.java.simpleName
     private val mainActivityViewModel: MainActivityViewModelImpl by viewModel()
-    private var cacheWebClient : CustomWebClient? = null;
+    private var cacheWebClient: CustomWebClient? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,36 +60,36 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
             button_siren.isEnabled = isEnabled!!
         })
-            mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
-                button_siren.isEnabled = isEnabled!!
-            })
+        mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
+            button_siren.isEnabled = isEnabled!!
+        })
 
-            mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
-                if (blinkingState == SirenBlinkingState.BLINK) {
-                    button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-                    doAsync {
-                        uiThreadLater({ context ->
-                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
-                            } else {
-                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                            }
-                        }, 500)
-                    }
-                } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
-                    button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
-                    doAsync {
-                        uiThreadLater({ context ->
-                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
-                            } else {
-                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                            }
-                        }, 500)
-                    }
+        mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
+            if (blinkingState == SirenBlinkingState.BLINK) {
+                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
+                doAsync {
+                    uiThreadLater({ context ->
+                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
+                        } else {
+                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                        }
+                    }, 500)
                 }
-            })
-        }
+            } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
+                button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
+                doAsync {
+                    uiThreadLater({ context ->
+                        if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
+                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
+                        } else {
+                            button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+                        }
+                    }, 500)
+                }
+            }
+        })
+    }
 
     override fun onResume() {
         super.onResume()
@@ -128,8 +129,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_settings -> {
-            // TODO: Implement show settings activity.
-            Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Reset settings?")
+                    .setMessage("This will disconnect you from your server completely and reset all settings.")
+                    .setPositiveButton("ACCEPT", { _, _ ->
+                        val config = mainActivityViewModel.getConfiguration().value!!
+                        config.configured = false
+                        this.mainActivityViewModel.saveConfiguration(config)
+                        finish()
+                    })
+                    .setNegativeButton("CANCEL", { _, _ ->
+                    })
+            builder.create().show()
             true
         }
         R.id.action_camera_move_calibration -> {

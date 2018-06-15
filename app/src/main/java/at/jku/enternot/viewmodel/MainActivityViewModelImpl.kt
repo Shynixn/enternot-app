@@ -92,6 +92,19 @@ class MainActivityViewModelImpl(applicationContext: Application, private val sir
     }
 
     /**
+     * Saves the given configuration.
+     */
+    override fun saveConfiguration(configuration: Configuration) {
+        doAsync {
+            try {
+                configurationService.saveConfiguration(configuration, getApplication())
+            } catch (e: IOException) {
+                Log.e(logTag, "Failed to save configuration.", e)
+            }
+        }
+    }
+
+    /**
      * Enables or disables the camera movement.
      * @param b True if the camera movement should be enabled otherwise false.
      */
