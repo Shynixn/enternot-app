@@ -16,7 +16,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
 
-
 class ConfigurationActivity : AppCompatActivity() {
     private val configurationViewModel: ConfigurationActivityViewModelImpl by viewModel()
 
@@ -85,15 +84,17 @@ class ConfigurationActivity : AppCompatActivity() {
      */
     private val testConnectionListener = View.OnClickListener {
         val configuration = getCurrentConfiguration()
-        configurationViewModel.getProgressingState().value = true
 
         if (configuration != null) {
+            configurationViewModel.saveConfiguration(configuration)
+            configurationViewModel.getProgressingState().value = true
+
             doAsync {
-                val statusCode = configurationViewModel.testConnection(configuration)
+                val response = configurationViewModel.testConnection(configuration)
 
                 uiThread { context ->
-                    when (statusCode) {
-                        200 -> Toast.makeText(context, "Connection successful", Toast.LENGTH_LONG).show()
+                    when (response.statusCode) {
+                        200 -> Toast.makeText(context, response.content!!, Toast.LENGTH_LONG).show()
                         401 -> Toast.makeText(context, "Entered username or password is invalid", Toast.LENGTH_LONG).show()
                         else -> Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
                     }
