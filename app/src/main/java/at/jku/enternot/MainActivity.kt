@@ -1,8 +1,13 @@
 package at.jku.enternot
 
+import android.Manifest
 import android.arch.lifecycle.Observer
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.net.Uri
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -23,6 +28,7 @@ import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
 
 class MainActivity : AppCompatActivity() {
+    private val PERMISSION_RECORD_AUDIO = 0
     private val logTag: String = MainActivity::class.java.simpleName
     private val mainActivityViewModel: MainActivityViewModelImpl by viewModel()
     private var cacheWebClient: CustomWebClient? = null;
@@ -112,6 +118,11 @@ class MainActivity : AppCompatActivity() {
             val (x, y, z) = it ?: Triple(0, 0, 0)
             Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
         })
+
+        mainActivityViewModel.getAudioData().observe(this, Observer {
+            // TODO: Send data to the raspberry pi
+            //Log.i(logTag, "Audio data: ${Arrays.toString(it)}")
+        })
     }
 
     override fun onDestroy() {
@@ -150,9 +161,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode) {
+            PERMISSION_RECORD_AUDIO -> {
+                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mainActivityViewModel.enableVoiceRecording(true)
+                    toggle_button_voice?.isChecked = true
+                }
+            }
+        }
+    }
+
     private fun onVoiceCheckChange(button: CompoundButton, isChecked: Boolean) {
-        // TODO: Implement activate voice listener
-        Toast.makeText(this, "Not Implemented", Toast.LENGTH_SHORT).show()
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_RECORD_AUDIO)
+            button.isChecked = false
+        } else {
+            mainActivityViewModel.enableVoiceRecording(isChecked)
+        }
     }
 
     private fun onCameraMoveCheckChange(button: CompoundButton, isChecked: Boolean) {

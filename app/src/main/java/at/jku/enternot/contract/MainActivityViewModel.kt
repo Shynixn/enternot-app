@@ -53,6 +53,17 @@ interface MainActivityViewModel {
     fun enableCameraMovement(b: Boolean)
 
     /**
+     * Gets the recorded audio data.
+     */
+    fun getAudioData(): LiveData<ByteArray>
+
+    /**
+     * Enables or disables the voice recording.
+     * @param b True if the voice recording should be enabled otherwise false.
+     */
+    fun enableVoiceRecording(b: Boolean)
+
+    /**  
      * Saves the given configuration.
      */
     fun saveConfiguration(configuration: Configuration)
