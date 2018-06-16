@@ -2,15 +2,19 @@ package at.jku.enternot.service
 
 import android.content.Context
 import android.util.Base64
+import android.util.Log
+import at.jku.enternot.MainActivity
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
 import at.jku.enternot.entity.Response
 import com.google.gson.Gson
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
 class ConnectionServiceIml(private val configurationService: ConfigurationService) : ConnectionService {
+    private val logTag: String = MainActivity::class.java.simpleName
     private val connectionTimeOut = 5000
 
     /**
@@ -35,7 +39,23 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
 
         conn.outputStream.use { outputStream ->
             if (item != null) {
-                outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
+                val byteBuffer = ByteArray(1024)
+                if (item is InputStream) {
+                    try {
+                        while (true) {
+                            val result = item.read(byteBuffer)
+                            if (result == -1) {
+                                break
+                            }
+                            outputStream.write(byteBuffer)
+                        }
+                    } catch (e: IOException) {
+                        Log.i(logTag, "Closed stream.")
+                    }
+
+                } else {
+                    outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
+                }
             }
         }
         conn.disconnect()
