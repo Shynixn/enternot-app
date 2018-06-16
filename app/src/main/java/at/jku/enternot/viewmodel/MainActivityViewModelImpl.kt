@@ -9,12 +9,17 @@ import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.CameraMovementService
 import at.jku.enternot.contract.MainActivityViewModel
 import at.jku.enternot.contract.SirenService
+import at.jku.enternot.contract.VoiceRecordService
 import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
 import org.jetbrains.anko.doAsync
 import java.io.IOException
-
-class MainActivityViewModelImpl(applicationContext: Application, private val sirenService: SirenService, private val configurationService: ConfigurationService, private val cameraMovementService: CameraMovementService) : AndroidViewModel(applicationContext), MainActivityViewModel {
+class MainActivityViewModelImpl(applicationContext: Application,
+                                private val sirenService: SirenService,
+                                private val configurationService: ConfigurationService,
+                                private val cameraMovementService: CameraMovementService,
+                                private val voiceRecordService: VoiceRecordService)
+    : AndroidViewModel(applicationContext), MainActivityViewModel {
     private val logTag: String = MainActivityViewModelImpl::class.java.simpleName
     private var progressingLoad: MutableLiveData<Boolean> = MutableLiveData()
     private var blinkingState: MutableLiveData<SirenBlinkingState> = MutableLiveData()
@@ -66,6 +71,13 @@ class MainActivityViewModelImpl(applicationContext: Application, private val sir
     }
 
     /**
+     * Gets the recorded audio data.
+     */
+    override fun getAudioData(): LiveData<ByteArray> {
+        return voiceRecordService.getAudioData()
+    }
+
+    /**
      * Plays the siren at the house of the app user.
      * @throws [IOException] when the connection to the server fails.
      */
@@ -110,5 +122,13 @@ class MainActivityViewModelImpl(applicationContext: Application, private val sir
      */
     override fun enableCameraMovement(b: Boolean) {
         cameraMovementService.enableCameraMovement(b)
+    }
+
+    /**
+     * Enables or disables the voice recording.
+     * @param b True if the voice recording should be enabled otherwise false.
+     */
+    override fun enableVoiceRecording(b: Boolean) {
+        voiceRecordService.enableVoiceRecording(b)
     }
 }
