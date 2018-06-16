@@ -2,10 +2,8 @@ package at.jku.enternot
 
 import android.Manifest
 import android.arch.lifecycle.Observer
-import android.content.pm.PackageManager
-import android.content.res.Configuration
-import android.net.Uri
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -20,6 +18,7 @@ import android.widget.Toast
 import at.jku.enternot.entity.SirenBlinkingState
 import at.jku.enternot.extension.isInPortrait
 import at.jku.enternot.extension.uiThreadLater
+import at.jku.enternot.service.GPSServiceImpl
 import at.jku.enternot.ui.CustomWebClient
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,10 +27,11 @@ import org.jetbrains.anko.uiThread
 import org.koin.android.architecture.ext.viewModel
 
 class MainActivity : AppCompatActivity() {
+    private val requestCodeAccessGPS = 50
     private val PERMISSION_RECORD_AUDIO = 0
     private val logTag: String = MainActivity::class.java.simpleName
     private val mainActivityViewModel: MainActivityViewModelImpl by viewModel()
-    private var cacheWebClient: CustomWebClient? = null;
+    private var cacheWebClient: CustomWebClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +46,17 @@ class MainActivity : AppCompatActivity() {
             toggle_button_move_camera.setOnCheckedChangeListener(this::onCameraMoveCheckChange)
             button_siren.setOnClickListener(this::onSirenClick)
         }
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION), requestCodeAccessGPS)
+        }
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), requestCodeAccessGPS)
+        }
+
+        val myIntent = Intent(this, GPSServiceImpl::class.java)
+        this.startService(myIntent)
 
         mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
             if (isProgressing!!) {
@@ -162,9 +173,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when(requestCode) {
+        when (requestCode) {
             PERMISSION_RECORD_AUDIO -> {
-                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mainActivityViewModel.enableVoiceRecording(true)
                     toggle_button_voice?.isChecked = true
                 }
@@ -173,7 +184,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onVoiceCheckChange(button: CompoundButton, isChecked: Boolean) {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_RECORD_AUDIO)
             button.isChecked = false
