@@ -14,7 +14,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class ConnectionServiceIml(private val configurationService: ConfigurationService) : ConnectionService {
-    private val logTag: String = MainActivity::class.java.simpleName
+    private val logTag: String = ConnectionService::class.java.simpleName
     private val connectionTimeOut = 5000
 
     /**
@@ -58,9 +58,12 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                 }
             }
         }
+
+        val responseCode = conn.responseCode;
+
         conn.disconnect()
 
-        return conn.responseCode
+        return responseCode
     }
 
     /**
