@@ -3,139 +3,83 @@ package at.jku.enternot
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
-import at.jku.enternot.entity.Configuration
+import at.jku.enternot.extension.isOpen
 import at.jku.enternot.viewmodel.ConfigurationActivityViewModelImpl
-import kotlinx.android.synthetic.main.content_configuration.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.android.synthetic.main.activity_configuration.*
 import org.koin.android.architecture.ext.viewModel
-
 
 class ConfigurationActivity : AppCompatActivity() {
     private val configurationViewModel: ConfigurationActivityViewModelImpl by viewModel()
-
-    //region Android
 
     /**
      * Android override create.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        // region Design
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_configuration)
 
-        toolbar.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white))
-        setSupportActionBar(toolbar)
-
-        // endregion
-
-        // region Listener
-        this.button_testConnection_configurationPage.setOnClickListener(testConnectionListener)
-        // endregion
+        toolbar_configuration.setTitleTextColor(ContextCompat.getColor(this, android.R.color.white))
+        setSupportActionBar(toolbar_configuration)
+        navigation_configuration.setOnNavigationItemReselectedListener(bottomNavigationListener)
 
         configurationViewModel.getConfiguration().observe(this, Observer { config ->
-            if (config != null) {
-                this.editText_host_configurationPage.setText(config.hostname)
-                this.editText_username_configurationPage.setText(config.username)
-                this.editText_password_configurationPage.setText(config.password)
-            }
-        })
-
-        configurationViewModel.getProgressingState().observe(this, Observer { isProgressing ->
-            if (isProgressing!!) {
-                progressbar_testConnection_configurationPage.visibility = View.VISIBLE
-                button_testConnection_configurationPage.isEnabled = false
+            if (config != null && config.configured) {
+                openMainActivity()
             } else {
-                progressbar_testConnection_configurationPage.visibility = View.INVISIBLE
-                button_testConnection_configurationPage.isEnabled = true
-            }
-        })
-    }
-
-    /**
-     * Android override createOptionsMenu.
-     */
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        toolbar.inflateMenu(R.menu.configuration_menu)
-        return true
-    }
-
-    /**
-     * Android override onOptionsItemSelected.
-     */
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menuItem_acceptSettings_configurationPage) {
-            saveConfigurationListener.onClick(item.actionView)
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    // endregion
-
-    /**
-     * When the view gets clicked the app checks for the server if it can connect.
-     */
-    private val testConnectionListener = View.OnClickListener {
-        val configuration = getCurrentConfiguration()
-        configurationViewModel.getProgressingState().value = true
-
-        if (configuration != null) {
-            doAsync {
-                val statusCode = configurationViewModel.testConnection(configuration)
-
-                uiThread { context ->
-                    when (statusCode) {
-                        200 -> Toast.makeText(context, "Connection successful", Toast.LENGTH_LONG).show()
-                        401 -> Toast.makeText(context, "Entered username or password is invalid", Toast.LENGTH_LONG).show()
-                        else -> Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
-                    }
-
-                    configurationViewModel.getProgressingState().value = false
+                if (supportFragmentManager.findFragmentByTag(ConfigurationWelcomeFragment.TAG) == null && supportFragmentManager.findFragmentByTag(ConfigurationTestConnectionFragment.TAG) == null) {
+                    openWelcomeFragment()
                 }
             }
-        }
+        })
     }
 
     /**
-     * When the view gets clicked the config values get checked, stored and opens the [MainActivity].
+     * Gets called when the user clicks next or back on the bottom navigation bar and changes the current fragment.
      */
-    private val saveConfigurationListener = View.OnClickListener {
-        val configuration = getCurrentConfiguration()
+    private val bottomNavigationListener = BottomNavigationView.OnNavigationItemReselectedListener { menuItem ->
+        if (menuItem.itemId == R.id.navigation_next) {
 
-        if (configuration != null) {
-            configurationViewModel.saveConfiguration(configuration)
-
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NO_HISTORY
-            startActivity(intent)
-        }
-    }
-
-    /**
-     * Returns the current entered [Configuration].
-     */
-    private fun getCurrentConfiguration(): Configuration? {
-        val hostname = this.editText_host_configurationPage.text.toString()
-        val username = this.editText_username_configurationPage.text.toString()
-        val password = this.editText_password_configurationPage.text.toString()
-
-        when {
-            hostname.isEmpty() -> Toast.makeText(this, "Please enter a hostname", Toast.LENGTH_LONG).show()
-            username.isEmpty() -> Toast.makeText(this, "Please enter a username", Toast.LENGTH_LONG).show()
-            password.isEmpty() -> Toast.makeText(this, "Please enter a password", Toast.LENGTH_LONG).show()
-            else -> {
-                return Configuration(hostname, username, password)
+            if (supportFragmentManager.isOpen(ConfigurationWelcomeFragment.TAG)) {
+                openTestConnectionFragment()
+            } else if (supportFragmentManager.isOpen(ConfigurationTestConnectionFragment.TAG)) {
+                openMainActivity()
+            }
+        } else if (menuItem.itemId == R.id.navigation_back) {
+            if (supportFragmentManager.isOpen(ConfigurationTestConnectionFragment.TAG)) {
+                openWelcomeFragment()
             }
         }
+    }
 
-        return null
+    /**
+     * Opens the main activity.
+     */
+    private fun openMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NO_HISTORY
+        startActivity(intent)
+        finish()
+    }
+
+    /**
+     * Opens the welcome fragment.
+     */
+    private fun openWelcomeFragment() {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container_configurationPage, ConfigurationWelcomeFragment(), ConfigurationWelcomeFragment.TAG)
+        transaction.commitNow()
+    }
+
+    /**
+     * Opens the test connection fragment.
+     */
+    private fun openTestConnectionFragment() {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container_configurationPage, ConfigurationTestConnectionFragment(), ConfigurationTestConnectionFragment.TAG)
+        transaction.commitNow()
     }
 }

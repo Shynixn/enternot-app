@@ -2,7 +2,10 @@ package at.jku.enternot.contract
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
+import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
+import java.io.IOException
 
 interface MainActivityViewModel {
 
@@ -28,6 +31,11 @@ interface MainActivityViewModel {
     fun getSirenBlinkingState(): MutableLiveData<SirenBlinkingState>
 
     /**
+     * Gets the current app configuration.
+     */
+    fun getConfiguration() : LiveData<Configuration>
+
+    /**
      * Gets the accelerometer sensor data.
      */
     fun getCameraMovementData(): MutableLiveData<Triple<Float, Float, Float>>
@@ -48,4 +56,9 @@ interface MainActivityViewModel {
      * @param b True if the voice recording should be enabled otherwise false.
      */
     fun enableVoiceRecording(b: Boolean)
+
+    /**  
+     * Saves the given configuration.
+     */
+    fun saveConfiguration(configuration: Configuration)
 }

@@ -9,6 +9,7 @@ import at.jku.enternot.contract.ConfigurationActivityViewModel
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
 import at.jku.enternot.entity.Configuration
+import at.jku.enternot.entity.Response
 import org.jetbrains.anko.doAsync
 import java.io.IOException
 
@@ -16,6 +17,7 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
     private val logTag: String = ConfigurationActivityViewModelImpl::class.java.simpleName
     private var configuration: MutableLiveData<Configuration>? = null
     private var progressingLoad: MutableLiveData<Boolean> = MutableLiveData()
+    private var successFulState: MutableLiveData<Boolean>? = null
 
     /**
      * Gets the configuration of the app.
@@ -30,6 +32,18 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
     }
 
     /**
+     * Gets the state if connection is successful.
+     */
+    override fun getSuccessfullState(): MutableLiveData<Boolean> {
+        if (successFulState == null) {
+            successFulState = MutableLiveData()
+            successFulState!!.value = false
+        }
+
+        return successFulState!!
+    }
+
+    /**
      * Gets the progressing state of the app.
      */
     override fun getProgressingState(): MutableLiveData<Boolean> {
@@ -39,12 +53,12 @@ class ConfigurationActivityViewModelImpl(applicationContext: Application, privat
     /**
      * Checks if the entered configuration can be used to connect to a server.
      */
-    override fun testConnection(configuration: Configuration): Int {
+    override fun testConnection(configuration: Configuration): Response<String> {
         return try {
-            connectionService.post<Void>("/api/testconnect")
-        } catch (e: IOException) {
+            connectionService.get("/status", String::class.java, getApplication())
+        } catch (e: Exception) {
             Log.e(logTag, "Failed to connect to the server.", e)
-            500
+            Response(500)
         }
     }
 

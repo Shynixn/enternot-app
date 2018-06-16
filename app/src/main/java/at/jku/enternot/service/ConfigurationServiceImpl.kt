@@ -17,6 +17,7 @@ class ConfigurationServiceImpl : ConfigurationService {
             putString("hostname", configuration.hostname)
             putString("username", configuration.username)
             putString("password", configuration.password)
+            putBoolean("configured", configuration.configured)
             // Security Concerns: SharedPreferences has the same security level as the account manager in android.
             // They both are getting stored in an apps personal storage which is only accessible by the app creating it. The AccountManager should be used once you get
             // an online authentication service (OAuth, Tokens...), but to keep it simple with Basic Authentication we use this.
@@ -35,7 +36,8 @@ class ConfigurationServiceImpl : ConfigurationService {
         val hostname = sharedPref.getString("hostname", null) ?: return null
         val username = sharedPref.getString("username", null) ?: return null
         val password = sharedPref.getString("password", null) ?: return null
+        val configured = sharedPref.getBoolean("configured", false)
 
-        return Configuration(hostname, username, password)
+        return Configuration(hostname, username, password, configured)
     }
 }
