@@ -18,6 +18,10 @@ class GPSServiceImpl : IntentService("GPS-SERVICE") {
     private val locationCheckInterval = 1000 * 60 * 10L
     private val connectionServiceIml = ConnectionServiceIml(ConfigurationServiceImpl())
 
+    companion object {
+        var initialized = false
+    }
+
     /**
      * This method is invoked on the worker thread with a request to process.
      * Only one Intent is processed at a time, but the processing happens on a
@@ -34,7 +38,11 @@ class GPSServiceImpl : IntentService("GPS-SERVICE") {
      * for details.
      */
     override fun onHandleIntent(intent: Intent) {
-        Log.i(logTag, "Trying to enable location listening..")
+        if (initialized) {
+            return
+        }
+
+        Log.i(logTag, "Trying to enable location listening.." + hashCode())
 
         if (Build.VERSION.SDK_INT >= 23 &&
                 (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -52,6 +60,8 @@ class GPSServiceImpl : IntentService("GPS-SERVICE") {
         if (location != null) {
             locationListener.onLocationChanged(location)
         }
+
+        initialized = true
 
         Log.i(logTag, "Enabled location listening.")
     }

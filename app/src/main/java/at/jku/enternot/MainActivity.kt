@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), requestCodeAccessGPS)
         }
 
-        val myIntent = Intent(this, GPSServiceImpl::class.java)
-        this.startService(myIntent)
+        val gpsIntent = Intent(this, GPSServiceImpl::class.java)
+        this.startService(gpsIntent)
 
         mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
             if (isProgressing!!) {
