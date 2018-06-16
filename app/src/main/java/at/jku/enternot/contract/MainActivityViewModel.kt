@@ -16,6 +16,12 @@ interface MainActivityViewModel {
     fun playSiren(): Int
 
     /**
+     * Stops the siren at the house of the app user.
+     * Returns the status code of the webRequest.
+     */
+    fun stopSiren(): Int
+
+    /**
      * Gets the progressing state of the app.
      */
     fun getProgressingState(): MutableLiveData<Boolean>
@@ -33,7 +39,7 @@ interface MainActivityViewModel {
     /**
      * Gets the current app configuration.
      */
-    fun getConfiguration() : LiveData<Configuration>
+    fun getConfiguration(): LiveData<Configuration>
 
     /**
      * Gets the accelerometer sensor data.

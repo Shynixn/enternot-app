@@ -28,6 +28,13 @@ fun <T> Context.uiThreadLater(f: (T) -> Unit, milliSeconds: Long) {
 }
 
 /**
+ * Returns if the current rotation is landscape or portrait.
+ */
+fun Context.isInPortrait(): Boolean {
+    return this.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+}
+
+/**
  * Returns if this fragment is visible and displayed.
  */
 fun FragmentManager.isOpen(tagName: String): Boolean {
