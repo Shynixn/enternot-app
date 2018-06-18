@@ -58,14 +58,6 @@ class MainActivity : AppCompatActivity() {
         val gpsIntent = Intent(this, GPSServiceImpl::class.java)
         this.startService(gpsIntent)
 
-        mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
-            if (isProgressing!!) {
-                progressbar_load_mainPage.visibility = View.VISIBLE
-            } else {
-                progressbar_load_mainPage.visibility = View.GONE
-            }
-        })
-
         mainActivityViewModel.getConfiguration().observe(this, Observer { config ->
             if (config != null) {
                 cacheWebClient = CustomWebClient(this, config)
@@ -73,38 +65,16 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
-            button_siren.isEnabled = isEnabled!!
-        })
-        mainActivityViewModel.getSirenButtonState().observe(this, Observer { isEnabled ->
-            button_siren.isEnabled = isEnabled!!
-        })
-
-        mainActivityViewModel.getSirenBlinkingState().observe(this, Observer { blinkingState ->
-            @Suppress("PLUGIN_WARNING")
-            if (isInPortrait()) {
-                if (blinkingState == SirenBlinkingState.BLINK) {
-                    this.button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-                    doAsync {
-                        uiThreadLater({ context ->
-                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK_OFF
-                            } else {
-                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                            }
-                        }, 500)
-                    }
-                } else if (blinkingState == SirenBlinkingState.BLINK_OFF) {
-                    this.button_siren.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_orange_dark))
-                    doAsync {
-                        uiThreadLater({ context ->
-                            if (mainActivityViewModel.getSirenBlinkingState().value != SirenBlinkingState.DISABLED) {
-                                mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
-                            } else {
-                                button_siren.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                            }
-                        }, 500)
-                    }
+        mainActivityViewModel.getSirenState().observe(this, Observer { isEnabled ->
+            if (isEnabled!!) {
+                if (isInPortrait()) {
+                    @Suppress("PLUGIN_WARNING")
+                    button_siren.text = "SIREN STOP"
+                }
+            } else {
+                if (isInPortrait()) {
+                    @Suppress("PLUGIN_WARNING")
+                    button_siren.text = "SIREN"
                 }
             }
         })
@@ -115,14 +85,6 @@ class MainActivity : AppCompatActivity() {
         // Sample Play Video code
 
         // Sample Play Video Code.
-
-        mainActivityViewModel.getProgressingState().observe(this, Observer { isProgressing ->
-            if (isProgressing!!) {
-                progressbar_load_mainPage.visibility = View.VISIBLE
-            } else {
-                progressbar_load_mainPage.visibility = View.GONE
-            }
-        })
 
         mainActivityViewModel.getCameraMovementData().observe(this, Observer {
             // TODO: Send data to the raspberry pi
@@ -142,6 +104,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.action_menu, menu)
+
         return true
     }
 
@@ -160,6 +123,10 @@ class MainActivity : AppCompatActivity() {
         }
         R.id.action_camera_move -> {
             item.isChecked = !item.isChecked
+            true
+        }
+        R.id.action_siren -> {
+            onSirenClick()
             true
         }
         else -> {
@@ -196,41 +163,56 @@ class MainActivity : AppCompatActivity() {
      * When the view gets clicked the app starts the siren.
      */
     private fun onSirenClick(view: View? = null) {
-        mainActivityViewModel.getProgressingState().value = true
-        mainActivityViewModel.getSirenButtonState().value = false
-
         if (isInPortrait()) {
             @Suppress("PLUGIN_WARNING")
             button_siren.isEnabled = false
         }
 
-        doAsync {
-            val statusCode = mainActivityViewModel.playSiren()
-            uiThread { context ->
-                when (statusCode) {
-                    200 -> {
-                        if (mainActivityViewModel.getSirenBlinkingState().value == null || mainActivityViewModel.getSirenBlinkingState().value == SirenBlinkingState.DISABLED) {
-                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.BLINK
+        if (!mainActivityViewModel.getSirenState().value!!) {
+            doAsync {
+                val statusCode = mainActivityViewModel.playSiren()
+                uiThread { context ->
+                    when (statusCode) {
+                        200 -> {
+                            Toast.makeText(context, "Siren started", Toast.LENGTH_LONG).show()
+                            mainActivityViewModel.getSirenState().value = true
                         }
-
-                        Toast.makeText(context, "Siren started", Toast.LENGTH_LONG).show()
-
-                        uiThreadLater({
-                            mainActivityViewModel.getSirenBlinkingState().value = SirenBlinkingState.DISABLED
-                            mainActivityViewModel.getSirenButtonState().value = true
-                        }, 15000)
+                        401 -> {
+                            Toast.makeText(context, "Stored username or password is invalid", Toast.LENGTH_LONG).show()
+                        }
+                        else -> {
+                            Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
+                        }
                     }
-                    401 -> {
-                        mainActivityViewModel.getSirenButtonState().value = true
-                        Toast.makeText(context, "Stored username or password is invalid", Toast.LENGTH_LONG).show()
-                    }
-                    else -> {
-                        mainActivityViewModel.getSirenButtonState().value = true
-                        Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
+
+                    if (isInPortrait()) {
+                        @Suppress("PLUGIN_WARNING")
+                        context.button_siren.isEnabled = true
                     }
                 }
+            }
+        } else {
+            doAsync {
+                val statusCode = mainActivityViewModel.stopSiren()
+                uiThread { context ->
+                    when (statusCode) {
+                        200 -> {
+                            Toast.makeText(context, "Siren stopped", Toast.LENGTH_LONG).show()
+                            mainActivityViewModel.getSirenState().value = false
+                        }
+                        401 -> {
+                            Toast.makeText(context, "Stored username or password is invalid", Toast.LENGTH_LONG).show()
+                        }
+                        else -> {
+                            Toast.makeText(context, "Cannot connect to the server", Toast.LENGTH_LONG).show()
+                        }
+                    }
 
-                mainActivityViewModel.getProgressingState().value = false
+                    if (isInPortrait()) {
+                        @Suppress("PLUGIN_WARNING")
+                        context.button_siren.isEnabled = true
+                    }
+                }
             }
         }
     }

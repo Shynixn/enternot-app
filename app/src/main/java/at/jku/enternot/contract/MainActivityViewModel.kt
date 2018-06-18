@@ -29,7 +29,7 @@ interface MainActivityViewModel {
     /**
      * Gets the siren button state of the app.
      */
-    fun getSirenButtonState(): MutableLiveData<Boolean>
+    fun getSirenState(): MutableLiveData<Boolean>
 
     /**
      * Gets the blinking state of the siren.
