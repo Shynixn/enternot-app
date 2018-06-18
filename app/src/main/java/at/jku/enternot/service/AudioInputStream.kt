@@ -25,7 +25,6 @@ class AudioInputStream(private var audioRecord: AudioRecord?) : InputStream() {
         return audioRecord!!.read(buffer, 0, 1)
     }
 
-
     /**
      * Reads some number of bytes from the input stream and stores them into
      * the buffer array `b`. The number of bytes actually read is
@@ -78,7 +77,7 @@ class AudioInputStream(private var audioRecord: AudioRecord?) : InputStream() {
      *  The `close` method of `InputStream` does
      * nothing.
      *
-     * @exception  IOException  if an I/O error occurs.
+     * @exception  IOException exception  if an I/O error occurs.
      */
     override fun close() {
         audioRecord = null
