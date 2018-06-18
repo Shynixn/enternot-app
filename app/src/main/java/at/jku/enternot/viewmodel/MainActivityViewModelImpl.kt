@@ -32,6 +32,7 @@ class MainActivityViewModelImpl(applicationContext: Application,
 
     init {
         blinkingState.value = SirenBlinkingState.DISABLED
+        sirenButtonState.value = false
     }
 
     /**
@@ -49,7 +50,7 @@ class MainActivityViewModelImpl(applicationContext: Application,
     /**
      * Gets the siren button state of the app.
      */
-    override fun getSirenButtonState(): MutableLiveData<Boolean> {
+    override fun getSirenState(): MutableLiveData<Boolean> {
         return sirenButtonState
     }
 

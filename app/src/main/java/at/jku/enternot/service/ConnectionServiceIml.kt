@@ -34,7 +34,6 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
 
         conn.setRequestProperty("Authorization", basicAuth)
         conn.connectTimeout = connectionTimeOut
-        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
         conn.requestMethod = "POST"
 
         conn.outputStream.use { outputStream ->
@@ -42,6 +41,7 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                 val byteBuffer = ByteArray(1024)
                 if (item is InputStream) {
                     try {
+                        conn.setRequestProperty("Content-Type", "application/octet-stream")
                         item.use {
                             while (true) {
                                 val result = item.read(byteBuffer)
@@ -49,19 +49,19 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                                     break
                                 }
                                 outputStream.write(byteBuffer)
-                                Log.i(logTag, "Send audio " + byteBuffer[2] + "sd...")
                             }
                         }
                     } catch (e: IOException) {
                         Log.i(logTag, "Closed stream.")
                     }
                 } else {
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                     outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
                 }
             }
         }
 
-        val responseCode = conn.responseCode;
+        val responseCode = conn.responseCode
 
         conn.disconnect()
 

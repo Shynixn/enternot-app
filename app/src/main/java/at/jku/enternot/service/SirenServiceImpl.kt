@@ -11,7 +11,7 @@ class SirenServiceImpl(private val connectionService: ConnectionService) : Siren
      * @throws [IOException] when the connection to the server fails.
      */
     override fun stopSiren(context: Context): Int {
-        return connectionService.post<Unit>("/siren/start", context)
+        return connectionService.post<Unit>("/siren/stop", context)
     }
 
     /**
@@ -20,6 +20,6 @@ class SirenServiceImpl(private val connectionService: ConnectionService) : Siren
      */
     @Throws(IOException::class)
     override fun playSiren(context: Context): Int {
-        return connectionService.post<Unit>("/siren/stop", context)
+        return connectionService.post<Unit>("/siren/start", context)
     }
 }
