@@ -129,11 +129,6 @@ class MainActivity : AppCompatActivity() {
             val (x, y, z) = it ?: Triple(0, 0, 0)
             Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
         })
-
-        mainActivityViewModel.getAudioData().observe(this, Observer {
-            // TODO: Send data to the raspberry pi
-            //Log.i(logTag, "Audio data: ${Arrays.toString(it)}")
-        })
     }
 
     override fun onDestroy() {
