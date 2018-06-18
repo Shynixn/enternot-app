@@ -36,8 +36,6 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
         conn.connectTimeout = connectionTimeOut
         conn.requestMethod = "POST"
 
-        val responseCode = conn.responseCode
-
         conn.outputStream.use { outputStream ->
             if (item != null) {
                 val byteBuffer = ByteArray(1024)
@@ -62,6 +60,8 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                 }
             }
         }
+
+        val responseCode = conn.responseCode
 
         conn.disconnect()
 
