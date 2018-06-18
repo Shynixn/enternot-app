@@ -36,12 +36,17 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
         conn.connectTimeout = connectionTimeOut
         conn.requestMethod = "POST"
 
+        if (item is InputStream) {
+            conn.setRequestProperty("Content-Type", "application/octet-stream")
+        } else {
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+        }
+
         conn.outputStream.use { outputStream ->
             if (item != null) {
                 val byteBuffer = ByteArray(1024)
                 if (item is InputStream) {
                     try {
-                        conn.setRequestProperty("Content-Type", "application/octet-stream")
                         item.use {
                             while (true) {
                                 val result = item.read(byteBuffer)
@@ -55,7 +60,6 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                         Log.i(logTag, "Closed stream.")
                     }
                 } else {
-                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                     outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
                 }
             }
