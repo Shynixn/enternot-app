@@ -2,14 +2,16 @@ package at.jku.enternot.service
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import at.jku.enternot.contract.ConnectionService
 import at.jku.enternot.contract.VoiceRecordService
 import org.jetbrains.anko.doAsync
 
-class VoiceRecordServiceImpl : VoiceRecordService {
+class VoiceRecordServiceImpl(private val connectionService: ConnectionService) : VoiceRecordService {
 
     private val logTag = this::class.java.simpleName
     private val sampleRate = 16000
@@ -24,11 +26,11 @@ class VoiceRecordServiceImpl : VoiceRecordService {
      * Enables or disables the voice recording.
      * @param b: True if the voice recording should be enabled otherwise false.
      */
-    override fun enableVoiceRecording(b: Boolean) {
+    override fun enableVoiceRecording(b: Boolean, context: Context) {
         if (b && (!this::audioRecorder.isInitialized ||
                         audioRecorder.state == AudioRecord.STATE_UNINITIALIZED)) {
             initAudioRecorder()
-            startRecording()
+            startRecording(context)
         } else {
             stopRecording()
         }
@@ -46,16 +48,11 @@ class VoiceRecordServiceImpl : VoiceRecordService {
                 audioEncoding, bufferSize)
     }
 
-    private fun startRecording() {
-        val buffer = ByteArray(bufferSize)
+    private fun startRecording(context: Context) {
         audioRecorder.startRecording()
         doAsync {
-            while (audioRecorder.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
-                val bytesRead = audioRecorder.read(buffer, 0, buffer.size)
-                Log.d(logTag, "Bytes read: $bytesRead")
-                //Log.d(logTag, "Read bytes: ${Arrays.toString(buffer)}")
-                audioData.postValue(buffer)
-            }
+            val audioInputStream = AudioInputStream(audioRecorder)
+            connectionService.post("/audio/stream", context, audioInputStream)
             Log.d(logTag, "Stopped recording task!")
         }
         Log.d(logTag, "Started recording!")

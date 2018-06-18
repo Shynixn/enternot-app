@@ -24,7 +24,7 @@ class EnternotApplication : Application() {
         bean { SirenServiceImpl(connectionService) as SirenService }
         bean { configurationService as ConfigurationService }
         bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
-        bean { VoiceRecordServiceImpl() as VoiceRecordService }
+        bean { VoiceRecordServiceImpl(connectionService) as VoiceRecordService }
         viewModel { ConfigurationActivityViewModelImpl(this.androidApplication(), get(), get()) }
         bean { configurationService as ConfigurationService }
         bean { connectionService as ConnectionService }

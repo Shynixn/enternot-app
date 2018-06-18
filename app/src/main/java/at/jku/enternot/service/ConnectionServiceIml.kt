@@ -42,17 +42,19 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                 val byteBuffer = ByteArray(1024)
                 if (item is InputStream) {
                     try {
-                        while (true) {
-                            val result = item.read(byteBuffer)
-                            if (result == -1) {
-                                break
+                        item.use {
+                            while (true) {
+                                val result = item.read(byteBuffer)
+                                if (result == -1) {
+                                    break
+                                }
+                                outputStream.write(byteBuffer)
+                                Log.i(logTag, "Send audio " + byteBuffer[2] + "sd...")
                             }
-                            outputStream.write(byteBuffer)
                         }
                     } catch (e: IOException) {
                         Log.i(logTag, "Closed stream.")
                     }
-
                 } else {
                     outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
                 }

@@ -17,6 +17,7 @@ import at.jku.enternot.extension.uiThreadLater
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.IOException
+
 class MainActivityViewModelImpl(applicationContext: Application,
                                 private val sirenService: SirenService,
                                 private val configurationService: ConfigurationService,
@@ -71,13 +72,6 @@ class MainActivityViewModelImpl(applicationContext: Application,
      */
     override fun getCameraMovementData(): MutableLiveData<Triple<Float, Float, Float>> {
         return cameraMovementService.getAxisData()
-    }
-
-    /**
-     * Gets the recorded audio data.
-     */
-    override fun getAudioData(): LiveData<ByteArray> {
-        return voiceRecordService.getAudioData()
     }
 
     /**
@@ -145,6 +139,6 @@ class MainActivityViewModelImpl(applicationContext: Application,
      * @param b True if the voice recording should be enabled otherwise false.
      */
     override fun enableVoiceRecording(b: Boolean) {
-        voiceRecordService.enableVoiceRecording(b)
+        voiceRecordService.enableVoiceRecording(b, getApplication())
     }
 }
