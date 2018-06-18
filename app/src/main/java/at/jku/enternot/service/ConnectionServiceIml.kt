@@ -51,7 +51,6 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
                                     break
                                 }
                                 outputStream.write(byteBuffer)
-                                Log.i(logTag, "Send audio " + byteBuffer[2] + "sd...")
                             }
                         }
                     } catch (e: IOException) {
