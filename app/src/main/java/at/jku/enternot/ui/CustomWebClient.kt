@@ -16,6 +16,7 @@ class CustomWebClient(private var context: MainActivity?, private val configurat
      * Loads the webClient url on start.
      */
     init {
+        context!!.webview.settings.javaScriptEnabled = true
         context!!.webview.loadUrl(configuration.hostname + "/camera/stream")
     }
 
@@ -37,7 +38,7 @@ class CustomWebClient(private var context: MainActivity?, private val configurat
     override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
         if (reConnectionAttempts < 10) {
             context?.webview?.reload()
-            reConnectionAttempts++;
+            reConnectionAttempts++
         }
     }
 

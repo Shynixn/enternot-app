@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import android.widget.Toast
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.CameraMovementService
 import at.jku.enternot.contract.MainActivityViewModel
@@ -12,8 +13,11 @@ import at.jku.enternot.contract.SirenService
 import at.jku.enternot.contract.VoiceRecordService
 import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
+import at.jku.enternot.extension.uiThreadLater
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import java.io.IOException
+
 class MainActivityViewModelImpl(applicationContext: Application,
                                 private val sirenService: SirenService,
                                 private val configurationService: ConfigurationService,
@@ -28,6 +32,7 @@ class MainActivityViewModelImpl(applicationContext: Application,
 
     init {
         blinkingState.value = SirenBlinkingState.DISABLED
+        sirenButtonState.value = false
     }
 
     /**
@@ -45,7 +50,7 @@ class MainActivityViewModelImpl(applicationContext: Application,
     /**
      * Gets the siren button state of the app.
      */
-    override fun getSirenButtonState(): MutableLiveData<Boolean> {
+    override fun getSirenState(): MutableLiveData<Boolean> {
         return sirenButtonState
     }
 
@@ -71,19 +76,25 @@ class MainActivityViewModelImpl(applicationContext: Application,
     }
 
     /**
-     * Gets the recorded audio data.
-     */
-    override fun getAudioData(): LiveData<ByteArray> {
-        return voiceRecordService.getAudioData()
-    }
-
-    /**
      * Plays the siren at the house of the app user.
      * @throws [IOException] when the connection to the server fails.
      */
     override fun playSiren(): Int {
         return try {
-            sirenService.playSiren()
+            sirenService.playSiren(getApplication())
+        } catch (e: IOException) {
+            Log.e(logTag, "Failed to connect to the server.", e)
+            500
+        }
+    }
+
+    /**
+     * Stops the siren at the house of the app user.
+     * Returns if disabling was successful.
+     */
+    override fun stopSiren(): Int {
+        return try {
+            sirenService.stopSiren(getApplication())
         } catch (e: IOException) {
             Log.e(logTag, "Failed to connect to the server.", e)
             500
@@ -129,6 +140,6 @@ class MainActivityViewModelImpl(applicationContext: Application,
      * @param b True if the voice recording should be enabled otherwise false.
      */
     override fun enableVoiceRecording(b: Boolean) {
-        voiceRecordService.enableVoiceRecording(b)
+        voiceRecordService.enableVoiceRecording(b, getApplication())
     }
 }

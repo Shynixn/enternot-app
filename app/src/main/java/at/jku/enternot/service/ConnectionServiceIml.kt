@@ -2,15 +2,19 @@ package at.jku.enternot.service
 
 import android.content.Context
 import android.util.Base64
+import android.util.Log
+import at.jku.enternot.MainActivity
 import at.jku.enternot.contract.ConfigurationService
 import at.jku.enternot.contract.ConnectionService
 import at.jku.enternot.entity.Response
 import com.google.gson.Gson
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
 class ConnectionServiceIml(private val configurationService: ConfigurationService) : ConnectionService {
+    private val logTag: String = ConnectionService::class.java.simpleName
     private val connectionTimeOut = 5000
 
     /**
@@ -30,17 +34,42 @@ class ConnectionServiceIml(private val configurationService: ConfigurationServic
 
         conn.setRequestProperty("Authorization", basicAuth)
         conn.connectTimeout = connectionTimeOut
-        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
         conn.requestMethod = "POST"
+
+        if (item is InputStream) {
+            conn.setRequestProperty("Content-Type", "application/octet-stream")
+        } else {
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+        }
 
         conn.outputStream.use { outputStream ->
             if (item != null) {
-                outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
+                val byteBuffer = ByteArray(1024)
+                if (item is InputStream) {
+                    try {
+                        item.use {
+                            while (true) {
+                                val result = item.read(byteBuffer)
+                                if (result == -1) {
+                                    break
+                                }
+                                outputStream.write(byteBuffer)
+                            }
+                        }
+                    } catch (e: IOException) {
+                        Log.i(logTag, "Closed stream.")
+                    }
+                } else {
+                    outputStream.write(Gson().toJson(item)!!.toByteArray(Charsets.UTF_8))
+                }
             }
         }
+
+        val responseCode = conn.responseCode
+
         conn.disconnect()
 
-        return conn.responseCode
+        return responseCode
     }
 
     /**

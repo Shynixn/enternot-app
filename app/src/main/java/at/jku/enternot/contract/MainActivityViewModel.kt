@@ -16,6 +16,12 @@ interface MainActivityViewModel {
     fun playSiren(): Int
 
     /**
+     * Stops the siren at the house of the app user.
+     * Returns the status code of the webRequest.
+     */
+    fun stopSiren(): Int
+
+    /**
      * Gets the progressing state of the app.
      */
     fun getProgressingState(): MutableLiveData<Boolean>
@@ -23,7 +29,7 @@ interface MainActivityViewModel {
     /**
      * Gets the siren button state of the app.
      */
-    fun getSirenButtonState(): MutableLiveData<Boolean>
+    fun getSirenState(): MutableLiveData<Boolean>
 
     /**
      * Gets the blinking state of the siren.
@@ -33,7 +39,7 @@ interface MainActivityViewModel {
     /**
      * Gets the current app configuration.
      */
-    fun getConfiguration() : LiveData<Configuration>
+    fun getConfiguration(): LiveData<Configuration>
 
     /**
      * Gets the accelerometer sensor data.
@@ -45,11 +51,6 @@ interface MainActivityViewModel {
      * @param b True if the camera movement should be enabled otherwise false.
      */
     fun enableCameraMovement(b: Boolean)
-
-    /**
-     * Gets the recorded audio data.
-     */
-    fun getAudioData(): LiveData<ByteArray>
 
     /**
      * Enables or disables the voice recording.
