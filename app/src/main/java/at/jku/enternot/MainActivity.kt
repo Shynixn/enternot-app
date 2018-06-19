@@ -9,15 +9,12 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
-import at.jku.enternot.entity.SirenBlinkingState
 import at.jku.enternot.extension.isInPortrait
-import at.jku.enternot.extension.uiThreadLater
 import at.jku.enternot.service.GPSServiceImpl
 import at.jku.enternot.ui.CustomWebClient
 import at.jku.enternot.viewmodel.MainActivityViewModelImpl
@@ -87,9 +84,7 @@ class MainActivity : AppCompatActivity() {
         // Sample Play Video Code.
 
         mainActivityViewModel.getCameraMovementData().observe(this, Observer {
-            // TODO: Send data to the raspberry pi
-            val (x, y, z) = it ?: Triple(0, 0, 0)
-            Log.i(logTag, "Accelerometer Axis: x=$x, y=$y, z=$z")
+            mainActivityViewModel.sendCameraMovement(it ?: Triple(0f, 0f, 0f))
         })
     }
 

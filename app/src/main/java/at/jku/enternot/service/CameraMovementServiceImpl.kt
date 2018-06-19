@@ -7,14 +7,20 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
 import at.jku.enternot.R
 import at.jku.enternot.contract.CameraMovementService
+import at.jku.enternot.contract.ConnectionService
+import org.jetbrains.anko.doAsync
+import kotlin.math.roundToInt
 
-class CameraMovementServiceImpl(private val applicationContext: Application) : CameraMovementService,
-        SensorEventListener {
+class CameraMovementServiceImpl(private val applicationContext: Application,
+                                private val connectionService: ConnectionService)
+    : CameraMovementService, SensorEventListener {
 
+    private val logTag = this::class.java.simpleName
     private val sensorManager = applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    private val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+    private val gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
     private val axisData = MutableLiveData<Triple<Float, Float, Float>>()
 
     private lateinit var calibrationValues: Triple<Float, Float, Float>
@@ -29,10 +35,10 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
      */
     override fun enableCameraMovement(b: Boolean) {
         if(b) {
-            sensorManager.registerListener(this, accelerometer,
+            sensorManager.registerListener(this, gyroscope,
                     SensorManager.SENSOR_DELAY_NORMAL)
         } else {
-            sensorManager.unregisterListener(this, accelerometer)
+            sensorManager.unregisterListener(this, gyroscope)
         }
     }
 
@@ -49,7 +55,7 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
      */
     override fun calibrateSensor(f: () -> Unit) {
         sensorManager.registerListener(CalibrationListener { listener, data ->
-            sensorManager.unregisterListener(listener, accelerometer)
+            sensorManager.unregisterListener(listener, gyroscope)
             val average = Triple(
                     data.map { it.first }.average().toFloat(),
                     data.map { it.second }.average().toFloat(),
@@ -57,8 +63,36 @@ class CameraMovementServiceImpl(private val applicationContext: Application) : C
             )
             saveCalibrationValues(average)
             f.invoke()
-        }, accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
+        }, gyroscope, SensorManager.SENSOR_DELAY_FASTEST)
     }
+
+    /**
+     * Sends axis data to the pi.
+     */
+    override fun sendAxisData(data: Triple<Float, Float, Float>) {
+        doAsync {
+            val x: Int
+            val y: Int
+            if(isInPortrait()) {
+                x = data.first.roundToInt()
+                y = data.second.roundToInt()
+            } else {
+                x = data.second.roundToInt()
+                y = data.first.roundToInt()
+            }
+            if(x > 0 || x < 0 || y > 0 || y < 0) {
+                val responseCode = connectionService.post("/camera/position",
+                        applicationContext, CameraPosition((x * 36).toFloat(), (y * 36).toFloat()))
+                Log.d(logTag, "Response code: $responseCode")
+            }
+        }
+    }
+
+    data class CameraPosition(val x_angle: Float, val y_angle: Float)
+
+    private fun isInPortrait(): Boolean =
+            applicationContext.resources.configuration.orientation ==
+                    android.content.res.Configuration.ORIENTATION_PORTRAIT
 
     /**
      * Saves the calibration values to the shared preferences.
