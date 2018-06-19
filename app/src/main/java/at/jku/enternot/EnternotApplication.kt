@@ -23,13 +23,13 @@ class EnternotApplication : Application() {
         viewModel { MainActivityViewModelImpl(this.androidApplication(), get(), get(), get(), get()) } // get() will resolve Repository instance
         bean { SirenServiceImpl(connectionService) as SirenService }
         bean { configurationService as ConfigurationService }
-        bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
+        bean { CameraMovementServiceImpl(this.androidApplication(), connectionService) as CameraMovementService }
         bean { VoiceRecordServiceImpl(connectionService) as VoiceRecordService }
         viewModel { ConfigurationActivityViewModelImpl(this.androidApplication(), get(), get()) }
         bean { configurationService as ConfigurationService }
         bean { connectionService as ConnectionService }
         viewModel { CalibrationDialogViewModelImpl(this.androidApplication(), get()) }
-        bean { CameraMovementServiceImpl(this.androidApplication()) as CameraMovementService }
+        bean { CameraMovementServiceImpl(this.androidApplication(), connectionService) as CameraMovementService }
     }
 
     override fun onCreate() {

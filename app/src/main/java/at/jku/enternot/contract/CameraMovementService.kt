@@ -21,4 +21,9 @@ interface CameraMovementService {
      * @param f: Callback when the calibration has finished.
      */
     fun calibrateSensor(f: () -> Unit)
+
+    /**
+     * Sends axis data to the pi.
+     */
+    fun sendAxisData(data: Triple<Float, Float, Float>)
 }

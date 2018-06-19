@@ -5,17 +5,10 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import android.widget.Toast
-import at.jku.enternot.contract.ConfigurationService
-import at.jku.enternot.contract.CameraMovementService
-import at.jku.enternot.contract.MainActivityViewModel
-import at.jku.enternot.contract.SirenService
-import at.jku.enternot.contract.VoiceRecordService
+import at.jku.enternot.contract.*
 import at.jku.enternot.entity.Configuration
 import at.jku.enternot.entity.SirenBlinkingState
-import at.jku.enternot.extension.uiThreadLater
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import java.io.IOException
 
 class MainActivityViewModelImpl(applicationContext: Application,
@@ -73,6 +66,13 @@ class MainActivityViewModelImpl(applicationContext: Application,
      */
     override fun getCameraMovementData(): MutableLiveData<Triple<Float, Float, Float>> {
         return cameraMovementService.getAxisData()
+    }
+
+    /**
+     * Sends the camera movement changes to the pi.
+     */
+    override fun sendCameraMovement(data: Triple<Float, Float, Float>) {
+        this.cameraMovementService.sendAxisData(data)
     }
 
     /**
